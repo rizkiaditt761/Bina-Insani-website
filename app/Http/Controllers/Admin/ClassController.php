@@ -69,10 +69,18 @@ class ClassController extends Controller
         $this->classService->create($data);
 
 
-        return back()->with(
-            'success',
-            'Kelas berhasil ditambahkan'
-        );
+        return redirect()
+            ->route('classes.index')
+            ->with(
+                'success',
+                'Program berhasil ditambahkan.'
+            );
+    }
+
+
+    public function create()
+    {
+        return view('admin.classes.create');
     }
 
 
@@ -133,9 +141,22 @@ class ClassController extends Controller
         );
 
 
-        return back()->with(
-            'success',
-            'Kelas berhasil diperbarui'
+        return redirect()
+            ->route('classes.index')
+            ->with(
+                'success',
+                'Program berhasil diperbarui.'
+        );
+    }
+
+
+    public function show(int $id)
+    {
+        $class = $this->classService->findById($id);
+
+        return view(
+            'admin.classes.show',
+            compact('class')
         );
     }
 
@@ -145,9 +166,11 @@ class ClassController extends Controller
         $this->classService->delete($id);
 
 
-        return back()->with(
-            'success',
-            'Kelas berhasil dihapus'
-        );
+        return redirect()
+            ->route('classes.index')
+            ->with(
+                'success',
+                'Program berhasil dihapus.'
+         );
     }
 }

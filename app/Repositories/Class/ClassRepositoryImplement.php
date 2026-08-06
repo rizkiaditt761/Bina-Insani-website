@@ -14,7 +14,8 @@ class ClassRepositoryImplement implements ClassRepository
 
     public function findById(int $id)
     {
-        return CourseClass::findOrFail($id);
+        return CourseClass::withCount('registrations')
+            ->findOrFail($id);
     }
 
 
