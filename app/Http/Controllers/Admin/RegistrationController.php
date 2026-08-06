@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\Registration\RegistrationService;
+use App\Models\Registration;
 use Illuminate\Http\Request;
 
 class RegistrationController extends Controller
 {
+
     protected RegistrationService $registrationService;
 
 
@@ -18,42 +20,94 @@ class RegistrationController extends Controller
     }
 
 
+
+    /**
+     * Registration List
+     */
     public function index()
     {
-        $registrations = $this->registrationService->getAll();
+
+        $registrations = $this->registrationService
+            ->getAll();
+
+
+
+        $total = Registration::count();
+
+
+        $waitingPayment = Registration::where(
+            'status',
+            'waiting_payment'
+        )->count();
+
+
+        $waitingVerification = Registration::where(
+            'status',
+            'waiting_verification'
+        )->count();
+
+
+        $accepted = Registration::where(
+            'status',
+            'accepted'
+        )->count();
+
+
 
         return view(
             'admin.registrations.index',
-            compact('registrations')
+            compact(
+                'registrations',
+                'total',
+                'waitingPayment',
+                'waitingVerification',
+                'accepted'
+            )
         );
+
     }
 
 
+
+
+
+    /**
+     * Registration Detail
+     */
     public function show(int $id)
     {
-        $registration = $this->registrationService->findById($id);
+
+        $registration = $this->registrationService
+            ->findById($id);
+
+
 
         return view(
             'admin.registrations.show',
-            compact('registration')
+            compact(
+                'registration'
+            )
         );
+
     }
 
 
+
+
+
+    /**
+     * Manual Create (sementara)
+     */
     public function store(Request $request)
     {
-        $data = $request->validate([
 
-            'registration_number' => [
-                'required',
-                'string',
-                'unique:registrations,registration_number'
-            ],
+        $data = $request->validate([
 
             'course_class_id' => [
                 'required',
-                'exists:course_classes,id'
+                'exists:classes,id'
             ],
+
 
             'full_name' => [
                 'required',
@@ -61,60 +115,97 @@ class RegistrationController extends Controller
                 'max:255'
             ],
 
+
             'email' => [
                 'required',
                 'email'
             ],
+
 
             'phone' => [
                 'required',
                 'string'
             ],
 
+
             'gender' => [
                 'required'
             ],
+
 
             'birth_date' => [
                 'required',
                 'date'
             ],
 
+
             'city' => [
                 'required',
                 'string'
             ],
+
 
             'address' => [
                 'required',
                 'string'
             ],
 
+
+            'last_education' => [
+                'required'
+            ],
+
+
+            'school_name' => [
+                'required',
+                'string'
+            ],
+
+
+            'graduation_year' => [
+                'required'
+            ],
+
+
             'status' => [
                 'nullable'
             ],
+
 
             'notes' => [
                 'nullable',
                 'string'
             ],
+
         ]);
 
 
-        $this->registrationService->create($data);
+
+        $this->registrationService
+            ->create($data);
 
 
-        return back()->with(
-            'success',
-            'Pendaftaran berhasil ditambahkan'
-        );
+
+        return back()
+            ->with(
+                'success',
+                'Pendaftaran berhasil ditambahkan'
+            );
+
     }
 
 
+
+
+
+    /**
+     * Update Status Registration
+     */
     public function update(
         Request $request,
         int $id
-    ) {
+    )
+    {
 
         $data = $request->validate([
 
@@ -122,34 +213,53 @@ class RegistrationController extends Controller
                 'required'
             ],
 
+
             'notes' => [
                 'nullable',
                 'string'
             ],
+
         ]);
 
 
-        $this->registrationService->update(
-            $id,
-            $data
-        );
+
+        $this->registrationService
+            ->update(
+                $id,
+                $data
+            );
 
 
-        return back()->with(
-            'success',
-            'Status pendaftaran berhasil diperbarui'
-        );
+
+        return back()
+            ->with(
+                'success',
+                'Status pendaftaran berhasil diperbarui'
+            );
+
     }
 
 
+
+
+
+    /**
+     * Delete Registration
+     */
     public function destroy(int $id)
     {
-        $this->registrationService->delete($id);
+
+        $this->registrationService
+            ->delete($id);
 
 
-        return back()->with(
-            'success',
-            'Pendaftaran berhasil dihapus'
-        );
+
+        return back()
+            ->with(
+                'success',
+                'Data pendaftaran berhasil dihapus'
+            );
+
     }
+
 }

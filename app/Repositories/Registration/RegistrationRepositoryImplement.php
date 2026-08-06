@@ -6,24 +6,45 @@ use App\Models\Registration;
 
 class RegistrationRepositoryImplement implements RegistrationRepository
 {
+
+    /**
+     * Get all registrations
+     */
     public function getAll()
     {
-        return Registration::with('courseClass')
+        return Registration::with([
+                'courseClass'
+            ])
             ->latest()
-            ->get();
+            ->paginate(10);
     }
 
 
+
+    /**
+     * Find registration detail
+     */
     public function findById(int $id)
     {
-        return Registration::with('courseClass')
+        return Registration::with([
+                'courseClass',
+                'payment'
+            ])
             ->findOrFail($id);
     }
 
+
+
+    /**
+     * Find by registration number
+     */
     public function findByRegistrationNumber(
         string $registrationNumber
     ) {
-        return Registration::with('courseClass')
+        return Registration::with([
+                'courseClass',
+                'payment'
+            ])
             ->where(
                 'registration_number',
                 $registrationNumber
@@ -32,14 +53,25 @@ class RegistrationRepositoryImplement implements RegistrationRepository
     }
 
 
+
+    /**
+     * Create registration
+     */
     public function create(array $data)
     {
         return Registration::create($data);
     }
 
 
-    public function update(int $id, array $data)
-    {
+
+    /**
+     * Update registration
+     */
+    public function update(
+        int $id,
+        array $data
+    ) {
+
         $registration = $this->findById($id);
 
         $registration->update($data);
@@ -48,10 +80,31 @@ class RegistrationRepositoryImplement implements RegistrationRepository
     }
 
 
+
+    /**
+     * Delete registration
+     */
     public function delete(int $id)
     {
         $registration = $this->findById($id);
 
         return $registration->delete();
     }
+
+
+
+    /**
+     * Find registration by email and phone
+     */
+    public function findByEmailAndPhone(
+        string $email,
+        string $phone
+    ) {
+
+        return Registration::where('email', $email)
+            ->where('phone', $phone)
+            ->first();
+
+    }
+
 }

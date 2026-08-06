@@ -23,12 +23,16 @@ class SettingSeeder extends Seeder
 
             'description' => 'LPK Bina Insani merupakan lembaga pelatihan kerja yang berfokus pada pelatihan bahasa Jepang dan persiapan kerja ke Jepang dengan pendampingan profesional.',
 
+            'about_alumni_count' => '100+',
 
             // Hero Section
             'hero_title' => 'Siap Kerja Dengan Kompetensi',
 
             'hero_subtitle' => 'Lembaga Pelatihan Kerja yang membantu peserta meningkatkan keterampilan dan kesiapan kerja.',
 
+            'hero_badge' => 'PROGRAM PELATIHAN & PENYALURAN KERJA KE JEPANG',
+
+            'hero_success_number' => '95%',
 
             // Contact
             'address' => 'Yogyakarta, Indonesia',

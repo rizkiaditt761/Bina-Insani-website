@@ -64,18 +64,11 @@
                     data-aos-delay="100"
                     class="inline-flex items-center gap-3 rounded-full border border-blue-400/20 bg-white/10 px-5 py-2 backdrop-blur-xl">
 
-                    <span
-                        class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm">
-
-                        🇯🇵
-
-                    </span>
-
 
                     <span
                         class="text-sm font-semibold tracking-wide text-blue-100">
 
-                        PROGRAM PELATIHAN & PENYALURAN KERJA KE JEPANG
+                        {{ $setting->hero_badge ?? 'PROGRAM PELATIHAN & PENYALURAN KERJA KE JEPANG' }}
 
                     </span>
 
@@ -339,12 +332,13 @@
                         data-aos-delay="500"
                         class="overflow-hidden rounded-[36px] border border-white/10 bg-white/10 p-3 shadow-[0_30px_80px_rgba(0,0,0,.35)] backdrop-blur-xl">
 
-
+                        
                         <img
-                            src="{{ asset('images/about.jpg') }}"
+                            src="{{ $setting->hero_image
+                                ? asset('storage/'.$setting->hero_image)
+                                : asset('images/about.jpg') }}"
                             alt="LPK Bina Insani"
                             class="h-[620px] w-[470px] rounded-[28px] object-cover transition duration-700 hover:scale-105">
-
 
                     </div>
 
@@ -419,7 +413,7 @@
                         <div
                             class="text-5xl font-black">
 
-                            95%
+                            {{ $setting->hero_success_number ?? '95%' }}
 
                         </div>
 
@@ -430,38 +424,6 @@
                             Lulusan Siap Bersaing
 
                         </div>
-
-
-                    </div>
-
-
-
-
-
-
-
-
-                    {{-- Card 3 --}}
-                    <div
-                        data-aos="zoom-in"
-                        data-aos-delay="900"
-                        class="absolute bottom-36 -left-10 rounded-3xl border border-white/10 bg-slate-900/80 px-6 py-5 text-white backdrop-blur-xl">
-
-
-                        <p
-                            class="text-sm text-slate-300">
-
-                            Program Aktif
-
-                        </p>
-
-
-                        <h3
-                            class="mt-1 text-3xl font-black">
-
-                            {{ $classes->count() }}
-
-                        </h3>
 
 
                     </div>

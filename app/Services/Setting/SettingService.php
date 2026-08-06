@@ -6,7 +6,8 @@ interface SettingService
 {
     public function getFirst();
 
-    public function getSetting();
-
-    public function update(array $data);
+    public function update(
+        int $id,
+        array $data
+    );
 }

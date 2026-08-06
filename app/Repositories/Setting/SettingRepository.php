@@ -6,14 +6,10 @@ interface SettingRepository
 {
     public function getFirst();
 
-    /**
-     * Get website setting.
-     */
-    public function getSetting();
+    public function findById(int $id);
 
-
-    /**
-     * Update website setting.
-     */
-    public function update(array $data);
+    public function update(
+        int $id,
+        array $data
+    );
 }

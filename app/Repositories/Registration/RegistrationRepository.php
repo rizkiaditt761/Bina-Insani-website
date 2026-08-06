@@ -15,4 +15,9 @@ interface RegistrationRepository
     public function update(int $id, array $data);
 
     public function delete(int $id);
+
+    public function findByEmailAndPhone(
+        string $email,
+        string $phone
+    );
 }

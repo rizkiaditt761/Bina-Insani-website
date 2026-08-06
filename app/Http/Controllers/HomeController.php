@@ -34,7 +34,7 @@ class HomeController extends Controller
     public function index()
     {
 
-        $setting = $this->settingService->getSetting();
+        $setting = $this->settingService->getFirst();
 
         $classes = $this->classService->getActive();
 

@@ -85,4 +85,15 @@ class RegistrationServiceImplement implements RegistrationService
             ]
         );
     }
+
+    public function findByEmailAndPhone(
+        string $email,
+        string $phone
+    ) {
+        return $this->registrationRepository
+            ->findByEmailAndPhone(
+                $email,
+                $phone
+            );
+    }
 }

@@ -1,36 +1,130 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<html lang="id">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<head>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8">
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+
+    <title>
+
+        @yield('title', 'Admin Panel')
+
+    </title>
+
+
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js',
+    ])
+
+</head>
+
+
+
+<body
+    class="h-screen overflow-hidden bg-slate-100 text-slate-800 antialiased">
+
+
+
+    <div
+        class="flex h-screen overflow-hidden">
+
+
+
+        {{-- Sidebar --}}
+        @include('components.admin.sidebar')
+
+
+
+
+
+        {{-- Right Content --}}
+        <div
+            class="flex min-w-0 flex-1 flex-col h-screen">
+
+
+
+
+
+            {{-- Topbar --}}
+            @include('components.admin.topbar')
+
+
+
+
+
+
+            <main
+    class="flex-1 overflow-y-auto">
+
+
+    <div
+        class="min-h-full flex flex-col">
+
+
+        <div
+            class="flex-1 p-6 lg:p-8">
+
+
+            @yield('content')
+
+
         </div>
-    </body>
+
+
+
+
+
+        {{-- Footer --}}
+        <footer
+            class="border-t border-slate-200 bg-white px-6 py-4 lg:px-8">
+
+
+            <div
+                class="flex items-center justify-between text-xs text-slate-400">
+
+
+                <p>
+                    © {{ date('Y') }} LPK Bina Insani
+                </p>
+
+
+                <p>
+                    Admin Panel
+                </p>
+
+
+            </div>
+
+
+        </footer>
+
+
+    </div>
+
+
+</main>
+
+
+
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+@stack('scripts')
+</body>
+
 </html>

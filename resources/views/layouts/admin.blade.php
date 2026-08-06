@@ -5,6 +5,21 @@
 
     <meta charset="UTF-8">
 
+    {{-- Favicon --}}
+    @if($setting?->favicon)
+
+        <link
+            rel="icon"
+            href="{{ asset('storage/'.$setting->favicon) }}?v={{ time() }}">
+
+    @else
+
+        <link
+            rel="icon"
+            href="{{ asset('favicon.ico') }}">
+
+    @endif
+
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
 

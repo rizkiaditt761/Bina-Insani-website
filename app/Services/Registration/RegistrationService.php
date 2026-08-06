@@ -19,8 +19,13 @@ interface RegistrationService
     public function delete(int $id);
 
     public function updateStatus(
-    int $registrationId,
-    string $status
+        int $registrationId,
+        string $status
+    );
+
+    public function findByEmailAndPhone(
+        string $email,
+        string $phone
     );
 
 }

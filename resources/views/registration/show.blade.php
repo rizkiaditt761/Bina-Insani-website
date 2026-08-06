@@ -84,6 +84,19 @@
 
                             @break
 
+                        
+
+                        @case('payment_rejected')
+
+                            <span
+                                class="mt-3 inline-flex rounded-full bg-red-100 px-5 py-2 font-semibold text-red-700">
+
+                                Pembayaran Ditolak
+
+                            </span>
+
+                            @break
+
 
                         @case('waiting_verification')
 
@@ -127,13 +140,29 @@
 
 
 
-                @if($registration->status === 'waiting_payment')
+                @if(
+                    in_array($registration->status, [
+                        'waiting_payment',
+                        'payment_rejected'
+                    ])
+                )
 
                     <a
                         href="{{ route('registration.payment.create',$registration->registration_number) }}"
                         class="rounded-xl bg-blue-600 px-7 py-3 text-center font-bold text-white shadow-lg transition hover:bg-blue-700">
 
-                        Bayar Sekarang
+                        @if(
+                            $registration->payments->isNotEmpty() &&
+                            $registration->payments->sortByDesc('created_at')->first()->status === 'rejected'
+                        )
+
+                            Upload Ulang Bukti Pembayaran
+
+                        @else
+
+                            Bayar Sekarang
+
+                        @endif
 
                     </a>
 
@@ -145,7 +174,80 @@
 
         </div>
 
+        
 
+        @if(
+
+            $registration->status === 'payment_rejected' &&
+            $registration->payments->isNotEmpty() &&
+            $registration->payments->sortByDesc('created_at')->first()->status === 'rejected'
+        )
+
+            <div
+                class="mt-8 rounded-3xl border border-red-200 bg-red-50 p-8 shadow-lg">
+
+                <div class="flex items-start gap-5">
+
+                    <div
+                        class="flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl">
+
+                        ❌
+
+                    </div>
+
+                    <div class="flex-1">
+
+                        <h2
+                            class="text-2xl font-bold text-red-700">
+
+                            Pembayaran Ditolak
+
+                        </h2>
+
+                        <p
+                            class="mt-3 text-slate-600">
+
+                            Bukti pembayaran yang Anda kirim belum dapat diverifikasi.
+                            Silakan periksa alasan dari admin di bawah ini, kemudian lakukan pembayaran ulang dan upload bukti pembayaran yang baru.
+
+                        </p>
+
+                        @php
+                            $lastPayment = $registration->payments
+                                ->sortByDesc('created_at')
+                                ->first();
+                        @endphp
+
+                        @if($lastPayment?->rejection_reason)
+
+    <div
+        class="mt-6 rounded-2xl border border-red-200 bg-white p-5">
+
+        <p
+            class="text-xs font-bold uppercase tracking-wider text-red-600">
+
+            Alasan dari Admin
+
+        </p>
+
+        <p
+            class="mt-3 leading-7 text-slate-700">
+
+            {{ $lastPayment->rejection_reason }}
+
+        </p>
+
+    </div>
+
+@endif
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        @endif
 
 
         {{-- Timeline --}}
@@ -174,7 +276,13 @@
                         ],
                         [
                             'title'=>'Pembayaran',
-                            'done'=>$registration->payments->count() > 0
+                            'done' => in_array(
+                                $registration->status,
+                                [
+                                    'waiting_verification',
+                                    'accepted'
+                                ]
+                            )
                         ],
                         [
                             'title'=>'Verifikasi',

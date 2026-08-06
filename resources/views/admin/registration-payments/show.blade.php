@@ -4,366 +4,528 @@
 
 @section('content')
 
-<div class="space-y-6">
+<div class="space-y-8">
 
-    {{-- Header --}}
-    <div class="flex items-center justify-between">
+
+{{-- HEADER --}}
+<div
+    data-aos="fade-down"
+    class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-blue-900 to-indigo-900 p-6 text-white shadow-2xl">
+
+
+    <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-400/20 blur-3xl"></div>
+    <div class="absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-cyan-400/10 blur-2xl"></div>
+
+
+    <div class="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
 
         <div>
 
-            <h1 class="text-3xl font-bold text-gray-900">
+            <span
+                class="inline-flex rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-blue-100">
 
                 Payment Detail
 
+            </span>
+
+
+            <h1 class="mt-4 text-2xl font-black tracking-tight lg:text-3xl">
+
+                Detail Pembayaran
+
             </h1>
 
-            <p class="mt-2 text-gray-500">
 
-                Detail pembayaran pendaftaran peserta.
+            <p class="mt-2 max-w-xl text-sm leading-6 text-blue-100">
+
+                Informasi lengkap pendaftaran peserta, program yang dipilih,
+                dan status pembayaran.
+
+            </p>
+
+
+        </div>
+
+
+
+        <a
+            href="{{ route('registration-payments.index') }}"
+            class="rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20">
+
+
+            Kembali
+
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+{{-- MAIN INFORMATION --}}
+<div
+    data-aos="fade-up"
+    class="grid gap-6 lg:grid-cols-3">
+
+
+
+{{-- PARTICIPANT --}}
+<div
+    class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:shadow-lg lg:col-span-2">
+
+
+    <div class="mb-8">
+
+        <h2 class="text-xl font-black text-slate-800">
+
+            Informasi Peserta
+
+        </h2>
+
+
+        <p class="mt-2 text-sm text-slate-500">
+
+            Data peserta yang melakukan pembayaran.
+
+        </p>
+
+    </div>
+
+
+
+    <div class="grid gap-6 md:grid-cols-2">
+
+
+        <div>
+
+            <p class="text-sm text-slate-500">
+                Nomor Registrasi
+            </p>
+
+            <p class="mt-2 font-bold text-slate-800">
+                {{ $payment->registration->registration_number }}
+            </p>
+
+        </div>
+
+
+
+        <div>
+
+            <p class="text-sm text-slate-500">
+                Nama Lengkap
+            </p>
+
+            <p class="mt-2 font-bold text-slate-800">
+                {{ $payment->registration->full_name }}
+            </p>
+
+        </div>
+
+
+
+        <div>
+
+            <p class="text-sm text-slate-500">
+                Email
+            </p>
+
+            <p class="mt-2 font-bold text-slate-800">
+                {{ $payment->registration->email }}
+            </p>
+
+        </div>
+
+
+
+        <div>
+
+            <p class="text-sm text-slate-500">
+                Nomor HP
+            </p>
+
+            <p class="mt-2 font-bold text-slate-800">
+                {{ $payment->registration->phone }}
+            </p>
+
+        </div>
+
+
+
+        <div>
+
+            <p class="text-sm text-slate-500">
+                Kota
+            </p>
+
+            <p class="mt-2 font-bold text-slate-800">
+                {{ $payment->registration->city }}
+            </p>
+
+        </div>
+
+
+
+        <div>
+
+            <p class="text-sm text-slate-500">
+                Jenis Kelamin
+            </p>
+
+            <p class="mt-2 font-bold text-slate-800">
+                {{ $payment->registration->gender }}
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+{{-- PROGRAM --}}
+<div
+    data-aos="fade-up"
+    data-aos-delay="100"
+    class="rounded-3xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-8 shadow-sm">
+
+
+    <div class="mb-8">
+
+        <h2 class="text-xl font-black text-slate-800">
+
+            Program
+
+        </h2>
+
+
+        <p class="mt-2 text-sm text-slate-500">
+
+            Program yang dipilih peserta.
+
+        </p>
+
+
+    </div>
+
+
+
+    <div class="space-y-7">
+
+
+        <div>
+
+            <p class="text-sm text-slate-500">
+                Nama Program
+            </p>
+
+
+            <p class="mt-2 text-lg font-black text-blue-700">
+
+                {{ $payment->registration->courseClass->name }}
 
             </p>
 
         </div>
 
-        <a
-            href="{{ route('registration-payments.index') }}"
-            class="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
 
-            Kembali
 
-        </a>
 
-    </div>
+        <div>
 
-    <div class="grid gap-6 lg:grid-cols-3">
+            <p class="text-sm text-slate-500">
+                Biaya Pendaftaran
+            </p>
 
-        {{-- Participant Information --}}
-        <div
-            class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm lg:col-span-2">
 
-            <h2
-                class="mb-6 text-lg font-semibold text-gray-900">
+            <p class="mt-2 text-2xl font-black text-slate-800">
 
-                Informasi Peserta
+                Rp {{ number_format($payment->registration->courseClass->registration_fee,0,',','.') }}
 
-            </h2>
-
-            <div class="grid gap-6 md:grid-cols-2">
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-
-                        Nomor Registrasi
-
-                    </p>
-
-                    <p class="mt-1 font-semibold text-gray-900">
-
-                        {{ $payment->registration->registration_number }}
-
-                    </p>
-
-                </div>
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-
-                        Nama Lengkap
-
-                    </p>
-
-                    <p class="mt-1 font-semibold text-gray-900">
-
-                        {{ $payment->registration->full_name }}
-
-                    </p>
-
-                </div>
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-
-                        Email
-
-                    </p>
-
-                    <p class="mt-1 font-semibold text-gray-900">
-
-                        {{ $payment->registration->email }}
-
-                    </p>
-
-                </div>
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-
-                        Nomor HP
-
-                    </p>
-
-                    <p class="mt-1 font-semibold text-gray-900">
-
-                        {{ $payment->registration->phone }}
-
-                    </p>
-
-                </div>
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-
-                        Kota
-
-                    </p>
-
-                    <p class="mt-1 font-semibold text-gray-900">
-
-                        {{ $payment->registration->city }}
-
-                    </p>
-
-                </div>
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-
-                        Jenis Kelamin
-
-                    </p>
-
-                    <p class="mt-1 font-semibold text-gray-900">
-
-                        {{ $payment->registration->gender }}
-
-                    </p>
-
-                </div>
-
-            </div>
+            </p>
 
         </div>
 
-        {{-- Class Information --}}
-        <div
-            class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
 
-            <h2
-                class="mb-6 text-lg font-semibold text-gray-900">
 
-                Program
 
-            </h2>
+        <div>
 
-            <div class="space-y-5">
+            <p class="text-sm text-slate-500">
+                Status Pembayaran
+            </p>
 
-                <div>
 
-                    <p class="text-sm text-gray-500">
+            <div class="mt-3">
 
-                        Nama Program
 
-                    </p>
+                @switch($payment->status)
 
-                    <p class="mt-1 font-semibold text-gray-900">
 
-                        {{ $payment->registration->courseClass->name }}
+                    @case('waiting_verification')
 
-                    </p>
+                        <span class="inline-flex rounded-full bg-amber-100 px-4 py-2 text-xs font-bold text-amber-700">
 
-                </div>
+                            Waiting Verification
 
-                <div>
+                        </span>
 
-                    <p class="text-sm text-gray-500">
+                    @break
 
-                        Biaya Pendaftaran
 
-                    </p>
 
-                    <p class="mt-1 text-xl font-bold text-blue-600">
+                    @case('verified')
 
-                        Rp {{ number_format($payment->registration->courseClass->registration_fee, 0, ',', '.') }}
+                        <span class="inline-flex rounded-full bg-emerald-100 px-4 py-2 text-xs font-bold text-emerald-700">
 
-                    </p>
+                            Verified
 
-                </div>
+                        </span>
 
-                <div>
+                    @break
 
-                    <p class="text-sm text-gray-500">
 
-                        Status Pembayaran
 
-                    </p>
+                    @case('rejected')
 
-                    <div class="mt-2">
+                        <span class="inline-flex rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700">
 
-                        @switch($payment->status)
+                            Rejected
 
-                            @case('waiting_verification')
+                        </span>
 
-                                <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
+                    @break
 
-                                    Waiting Verification
 
-                                </span>
+                @endswitch
 
-                                @break
-
-                            @case('verified')
-
-                                <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-
-                                    Verified
-
-                                </span>
-
-                                @break
-
-                            @case('rejected')
-
-                                <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-
-                                    Rejected
-
-                                </span>
-
-                                @break
-
-                        @endswitch
-
-                    </div>
-
-                </div>
 
             </div>
 
+
         </div>
+
 
     </div>
 
-        {{-- Payment Proof --}}
-    <div
-        class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
 
-        <h2 class="mb-6 text-lg font-semibold text-gray-900">
+</div>
+
+
+
+</div>
+
+ {{-- PAYMENT PROOF --}}
+<div
+    
+    class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:shadow-lg">
+
+
+    <div class="mb-8">
+
+        <h2 class="text-xl font-black text-slate-800">
 
             Bukti Pembayaran
 
         </h2>
 
-        @if ($payment->payment_proof)
 
-            <div class="overflow-hidden rounded-xl border border-gray-200">
+        <p class="mt-2 text-sm text-slate-500">
 
-                <img
-                    src="{{ Storage::url($payment->payment_proof) }}"
-                    alt="Payment Proof"
-                    class="w-full object-cover">
+            Dokumen pembayaran yang dikirim oleh peserta.
 
-            </div>
+        </p>
 
-            <div class="mt-5">
-
-                <a
-                    href="{{ Storage::url($payment->payment_proof) }}"
-                    target="_blank"
-                    class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700">
-
-                    Download Bukti
-
-                </a>
-
-            </div>
-
-        @else
-
-            <div
-                class="rounded-xl border border-dashed border-gray-300 py-16 text-center">
-
-                <p class="text-gray-500">
-
-                    Bukti pembayaran belum tersedia.
-
-                </p>
-
-            </div>
-
-        @endif
 
     </div>
 
-    {{-- Verification --}}
-    @if ($payment->status === 'waiting_verification')
+
+
+
+    @if ($payment->payment_proof)
+
 
         <div
-            class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
 
-            <h2
-                class="mb-6 text-lg font-semibold text-gray-900">
 
-                Verifikasi Pembayaran
+            {{-- JANGAN UBAH BAGIAN INI --}}
+            <img
+                src="{{ Storage::url($payment->payment_proof) }}"
+                alt="Payment Proof"
+                class="w-full object-cover">
 
-            </h2>
-
-            <div class="flex flex-wrap gap-3">
-
-                {{-- Approve --}}
-                <form
-                    action="{{ route('registration-payments.approve', $payment->id) }}"
-                    method="POST">
-
-                    @csrf
-                    @method('PATCH')
-
-                    <button
-                        type="submit"
-                        class="rounded-xl bg-green-600 px-6 py-3 font-semibold text-white transition hover:bg-green-700">
-
-                        Approve Pembayaran
-
-                    </button>
-
-                </form>
-
-                {{-- Reject --}}
-                <form
-                    action="{{ route('registration-payments.reject', $payment->id) }}"
-                    method="POST"
-                    class="flex-1">
-
-                    @csrf
-                    @method('PATCH')
-
-                    <textarea
-                        name="notes"
-                        rows="3"
-                        placeholder="Alasan penolakan (opsional)..."
-                        class="mb-3 w-full rounded-xl border-gray-300 focus:border-red-500 focus:ring-red-500"></textarea>
-
-                    <button
-                        type="submit"
-                        class="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-700">
-
-                        Reject Pembayaran
-
-                    </button>
-
-                </form>
-
-            </div>
 
         </div>
 
+
+
+        <div class="mt-5">
+
+
+            <a
+                href="{{ Storage::url($payment->payment_proof) }}"
+                target="_blank"
+                class="inline-flex items-center rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl">
+
+
+                Lihat Bukti Pembayaran
+
+
+            </a>
+
+
+        </div>
+
+
+
+    @else
+
+
+        <div
+            class="rounded-2xl border border-dashed border-slate-300 py-16 text-center">
+
+
+            <p class="text-slate-500">
+
+                Bukti pembayaran belum tersedia.
+
+            </p>
+
+
+        </div>
+
+
     @endif
 
+
 </div>
+
+
+
+
+
+{{-- VERIFICATION ACTION --}}
+@if ($payment->status === 'waiting_verification')
+
+
+<div
+    class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+
+
+    <div class="mb-6">
+
+        <h2 class="text-xl font-black text-slate-800">
+
+            Verifikasi Pembayaran
+
+        </h2>
+
+
+        <p class="mt-2 text-sm text-slate-500">
+
+            Lakukan pengecekan pembayaran sebelum menerima atau menolak.
+
+        </p>
+
+
+    </div>
+
+
+
+
+    <div class="flex flex-wrap gap-4">
+
+
+        {{-- APPROVE --}}
+        <form
+            action="{{ route('registration-payments.approve', $payment->id) }}"
+            method="POST">
+
+
+            @csrf
+            @method('PATCH')
+
+
+            <button
+                type="submit"
+                class="inline-flex items-center rounded-xl bg-emerald-600 px-6 py-3 font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-emerald-700">
+
+
+                Approve Pembayaran
+
+
+            </button>
+
+
+        </form>
+
+
+
+
+
+        {{-- REJECT --}}
+        <form
+            action="{{ route('registration-payments.reject', $payment->id) }}"
+            method="POST"
+            class="w-full lg:flex-1">
+
+
+            @csrf
+            @method('PATCH')
+
+
+
+            <textarea
+                name="notes"
+                rows="3"
+                placeholder="Masukkan alasan penolakan pembayaran..."
+                class="mb-3 w-full rounded-2xl border-slate-300 bg-slate-50 focus:border-red-500 focus:ring-red-500"></textarea>
+
+
+
+
+            <button
+                type="submit"
+                class="rounded-xl bg-red-600 px-6 py-3 font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-red-700">
+
+
+                Reject Pembayaran
+
+
+            </button>
+
+
+        </form>
+
+
+
+    </div>
+
+
+</div>
+
+
+@endif
+
+
+
+
+
+</div>
+
 
 @endsection

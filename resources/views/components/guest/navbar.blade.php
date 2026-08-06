@@ -35,23 +35,28 @@
 
 
                     <div
-                        class="flex
-                               h-10
-                               w-10
-                               items-center
-                               justify-center
-                               rounded-xl
-                               bg-gradient-to-br
-                               from-blue-600
-                               to-indigo-600
-                               text-sm
-                               font-black
-                               text-white
-                               shadow-md">
+                class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-white shadow-md">
 
+
+                
+                @if(isset($setting) && $setting?->logo)
+
+                    <img
+                        src="{{ asset('storage/' . $setting->logo) }}"
+                        class="h-full w-full object-cover"
+                        alt="Logo">
+
+
+                @else
+
+                    <span class="text-lg font-bold text-white">
                         BI
+                    </span>
 
-                    </div>
+                @endif
+
+
+            </div>
 
 
 
@@ -139,34 +144,57 @@
 
                 {{-- Desktop Action --}}
                 <div
-                    class="hidden lg:flex items-center gap-2">
+                class="hidden lg:flex items-center gap-3">
 
-                    <a
-                        href="{{ route('registration.create') }}"
-                        class="rounded-xl
-                               bg-gradient-to-r
-                               from-blue-600
-                               to-indigo-600
-                               px-5
-                               py-2
-                               text-sm
-                               font-semibold
-                               text-white
-                               shadow-md
-                               transition
-                               duration-300
-                               hover:-translate-y-0.5
-                               hover:shadow-lg">
+                {{-- Cek Pendaftaran --}}
+                <a
+                    href="{{ request()->cookie('registration_number')
+                        ? route('registration.show', request()->cookie('registration_number'))
+                        : route('registration.check') }}"
+                    class="rounded-xl
+                        border
+                        border-blue-200
+                        bg-white
+                        px-5
+                        py-2
+                        text-sm
+                        font-semibold
+                        text-blue-700
+                        shadow-sm
+                        transition
+                        duration-300
+                        hover:-translate-y-0.5
+                        hover:border-blue-300
+                        hover:bg-blue-50
+                        hover:shadow-md">
 
+                    Cek Pendaftaran
 
-                        Daftar Sekarang 
+                </a>
 
-                        
+                {{-- Daftar --}}
+                <a
+                    href="{{ route('registration.create') }}"
+                    class="rounded-xl
+                        bg-gradient-to-r
+                        from-blue-600
+                        to-indigo-600
+                        px-5
+                        py-2
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-md
+                        transition
+                        duration-300
+                        hover:-translate-y-0.5
+                        hover:shadow-lg">
 
-                    </a>
+                    Daftar Sekarang
 
+                </a>
 
-                </div>
+            </div>
 
 
 

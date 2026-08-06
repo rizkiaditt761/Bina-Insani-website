@@ -20,7 +20,8 @@ class RegistrationPayment extends Model
         'status',
         'verified_by',
         'verified_at',
-        'notes',
+        
+        'rejection_reason',
     ];
 
 

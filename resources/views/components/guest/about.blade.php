@@ -44,7 +44,9 @@
 
 
                     <img
-                        src="{{ asset('images/about.jpg') }}"
+                        src="{{ $setting->about_image
+                                ? asset('storage/'.$setting->about_image)
+                                : asset('images/about.jpg') }}"
                         alt="Tentang LPK Bina Insani"
                         loading="lazy"
                         class="h-[650px] w-full rounded-[28px] object-cover transition duration-700 hover:scale-105">
@@ -128,7 +130,7 @@
                     <h3
                         class="text-5xl font-black">
 
-                        100+
+                        {{ $setting->about_alumni_count ?? '100+' }}
 
                     </h3>
 
@@ -218,7 +220,7 @@
                     class="mt-6 text-5xl font-black leading-tight text-slate-900 xl:text-6xl">
 
 
-                    {{ $setting->site_name ?? 'LPK Bina Insani' }}
+                    {{ $setting->about_title ?? 'LPK Bina Insani' }}
 
 
                 </h2>
@@ -237,7 +239,7 @@
                     class="mt-8 text-lg leading-9 text-slate-600">
 
 
-                    {{ $setting->description
+                    {{ $setting->about_description
                         ?? 'LPK Bina Insani merupakan lembaga pelatihan kerja yang membantu calon tenaga kerja Indonesia memperoleh kemampuan bahasa Jepang, budaya kerja, dan keterampilan profesional sehingga siap bersaing di dunia kerja internasional.' }}
 
 
@@ -416,9 +418,9 @@
 
 
                         <h3
-                            class="text-4xl font-black text-blue-600">
+                            class="text-5xl font-black">
 
-                            100+
+                            {{ $setting->about_alumni_count ?? '100+' }}
 
                         </h3>
 

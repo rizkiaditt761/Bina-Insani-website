@@ -85,11 +85,55 @@ class RegistrationController extends Controller
 
         $registration = $this->registrationService->create($validated);
 
-        return redirect()->route(
+        return redirect()
+        ->route(
             'registration.success',
             $registration->registration_number
+        )
+        ->cookie(
+            'has_registration',
+            true,
+            60 * 24 * 30
         );
        
+    }
+
+    public function checkForm()
+    {
+        return view('registration.check');
+    }
+
+    public function check(Request $request)
+    {
+        $data = $request->validate([
+            'email' => [
+                'required',
+                'email',
+            ],
+            'phone' => [
+                'required',
+                'string',
+            ],
+        ]);
+
+        $registration = $this->registrationService
+            ->findByEmailAndPhone(
+                $data['email'],
+                $data['phone']
+            );
+
+        if (! $registration) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'email' => 'Data pendaftaran tidak ditemukan.',
+                ]);
+        }
+
+        return redirect()->route(
+            'registration.show',
+            $registration->registration_number
+        );
     }
 
     /**
@@ -148,8 +192,11 @@ class RegistrationController extends Controller
     Request $request,
     string $registrationNumber
     ) {
+
         $registration = $this->registrationService
             ->findByRegistrationNumber($registrationNumber);
+
+        abort_if(!$registration, 404);
 
         $request->validate([
             'payment_proof' => [
@@ -160,23 +207,9 @@ class RegistrationController extends Controller
             ],
         ]);
 
-        $paymentProof = $request
-            ->file('payment_proof')
-            ->store('registration-payments', 'public');
-
-        $this->registrationPaymentService->create([
-            'registration_id' => $registration->id,
-            'payment_method' => 'QRIS',
-            'amount' => $registration->courseClass->registration_fee,
-            'payment_proof' => $paymentProof,
-            'status' => 'waiting_verification',
-        ]);
-
-        $this->registrationService->update(
+        $this->registrationPaymentService->uploadPayment(
             $registration->id,
-            [
-                'status' => 'waiting_verification',
-            ]
+            $request->file('payment_proof')
         );
 
         return redirect()

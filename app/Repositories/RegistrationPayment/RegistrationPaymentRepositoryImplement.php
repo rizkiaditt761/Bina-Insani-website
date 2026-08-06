@@ -20,9 +20,21 @@ class RegistrationPaymentRepositoryImplement implements RegistrationPaymentRepos
                         'registration',
                         function ($q) use ($search) {
 
-                            $q->where('registration_number', 'like', "%{$search}%")
-                                ->orWhere('full_name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
+                            $q->where(
+                                'registration_number',
+                                'like',
+                                "%{$search}%"
+                            )
+                            ->orWhere(
+                                'full_name',
+                                'like',
+                                "%{$search}%"
+                            )
+                            ->orWhere(
+                                'email',
+                                'like',
+                                "%{$search}%"
+                            );
 
                         }
                     );
@@ -33,7 +45,10 @@ class RegistrationPaymentRepositoryImplement implements RegistrationPaymentRepos
                 $filters['status'] ?? null,
                 function ($query, $status) {
 
-                    $query->where('status', $status);
+                    $query->where(
+                        'status',
+                        $status
+                    );
 
                 }
             )
@@ -41,6 +56,8 @@ class RegistrationPaymentRepositoryImplement implements RegistrationPaymentRepos
             ->paginate(10)
             ->withQueryString();
     }
+
+
 
     public function findById(int $id)
     {
@@ -50,29 +67,42 @@ class RegistrationPaymentRepositoryImplement implements RegistrationPaymentRepos
             ->findOrFail($id);
     }
 
+
+
     public function findByRegistrationId(int $registrationId)
     {
         return RegistrationPayment::with([
                 'registration.courseClass'
             ])
-            ->where('registration_id', $registrationId)
+            ->where(
+                'registration_id',
+                $registrationId
+            )
             ->latest()
             ->first();
     }
+
+
 
     public function create(array $data)
     {
         return RegistrationPayment::create($data);
     }
 
-    public function update(int $id, array $data)
-    {
+
+
+    public function update(
+        int $id,
+        array $data
+    ) {
         $payment = $this->findById($id);
 
         $payment->update($data);
 
         return $payment;
     }
+
+
 
     public function delete(int $id)
     {
@@ -81,89 +111,236 @@ class RegistrationPaymentRepositoryImplement implements RegistrationPaymentRepos
         return $payment->delete();
     }
 
+
+
+
+
+    /**
+     * Approve Payment
+     */
     public function approve(
         int $id,
         int $verifiedBy
     ) {
+
         return DB::transaction(function () use (
             $id,
             $verifiedBy
         ) {
 
+
             $payment = $this->findById($id);
 
+
+
+            // Cegah approve ulang
+            if (
+                $payment->status !== 'waiting_verification'
+            ) {
+
+                return $payment;
+
+            }
+
+
+
+            // Update payment
             $payment->update([
+
                 'status' => 'verified',
+
                 'verified_by' => $verifiedBy,
+
                 'verified_at' => now(),
+
+                
+
             ]);
 
+
+
+            // Update registration
             $payment->registration->update([
+
                 'status' => 'accepted',
+
             ]);
+
+
 
             return $payment->fresh([
-                'registration.courseClass',
+
+                'registration.courseClass'
+
             ]);
+
         });
+
     }
 
+
+
+
+
+
+
+    /**
+     * Reject Payment
+     */
     public function reject(
         int $id,
         int $verifiedBy,
-        ?string $notes = null
+        ?string $rejectionReason = null
     ) {
+
         return DB::transaction(function () use (
+
             $id,
             $verifiedBy,
-            $notes
+            $rejectionReason
+
         ) {
+
 
             $payment = $this->findById($id);
 
+
+
+            // Cegah reject ulang
+            if (
+                $payment->status !== 'waiting_verification'
+            ) {
+
+                return $payment;
+
+            }
+
+
+
+            // Update payment
             $payment->update([
+
                 'status' => 'rejected',
+
                 'verified_by' => $verifiedBy,
+
                 'verified_at' => now(),
-                'notes' => $notes,
+
+                'rejection_reason' => $rejectionReason,
+
             ]);
 
+
+
+            // Kembalikan user ke tahap pembayaran
             $payment->registration->update([
-                'status' => 'waiting_payment',
+
+                'status' => 'payment_rejected',
+
             ]);
+
+
 
             return $payment->fresh([
-                'registration.courseClass',
+
+                'registration.courseClass'
+
             ]);
+
         });
+
     }
+
+
+    public function createOrUpdate(array $data)
+    {
+        $payment = RegistrationPayment::where(
+            'registration_id',
+            $data['registration_id']
+        )
+        ->latest('id')
+        ->first();
+
+        if ($payment) {
+
+            // hapus bukti lama
+            if (
+                $payment->payment_proof &&
+                \Storage::disk('public')->exists($payment->payment_proof)
+            ) {
+                \Storage::disk('public')->delete($payment->payment_proof);
+            }
+
+            $payment->update([
+
+                'payment_method' => $data['payment_method'],
+
+                'amount' => $data['amount'],
+
+                'payment_proof' => $data['payment_proof'],
+
+                'status' => 'waiting_verification',
+
+                'verified_by' => null,
+
+                'verified_at' => null,
+
+                'rejection_reason' => null,
+
+            ]);
+
+            return $payment->fresh();
+
+        }
+
+        return RegistrationPayment::create($data);
+    }
+
+
 
     public function getPending()
     {
         return RegistrationPayment::with([
                 'registration.courseClass'
             ])
-            ->where('status', 'waiting_verification')
+            ->where(
+                'status',
+                'waiting_verification'
+            )
             ->latest()
             ->get();
     }
+
+
+
+
 
     public function getVerified()
     {
         return RegistrationPayment::with([
                 'registration.courseClass'
             ])
-            ->where('status', 'verified')
+            ->where(
+                'status',
+                'verified'
+            )
             ->latest()
             ->get();
     }
+
+
+
+
 
     public function getRejected()
     {
         return RegistrationPayment::with([
                 'registration.courseClass'
             ])
-            ->where('status', 'rejected')
+            ->where(
+                'status',
+                'rejected'
+            )
             ->latest()
             ->get();
     }

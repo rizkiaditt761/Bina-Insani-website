@@ -13,32 +13,43 @@ class Setting extends Model
      */
     protected $fillable = [
 
-        // Website Identity
         'site_name',
+
         'logo',
         'favicon',
-        'description',
 
-        // Hero Section
         'hero_title',
         'hero_subtitle',
+        'hero_image',
+        'hero_badge',
+        'hero_success_number',
 
-        // Contact
+        'about_title',
+        'about_description',
+        'about_image',
+        'about_alumni_count',
+
+        'description',
+
         'address',
         'phone',
         'whatsapp',
         'email',
-
-        // Maps
         'google_maps',
 
-        // Payment
         'qris_image',
 
-        // Social Media
+        'bank_name',
+        'bank_account_name',
+        'bank_account_number',
+
         'facebook',
         'instagram',
         'youtube',
         'tiktok',
+
+        'footer_description',
+        'copyright',
+
     ];
 }

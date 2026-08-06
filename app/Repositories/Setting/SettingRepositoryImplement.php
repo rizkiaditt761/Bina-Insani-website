@@ -6,32 +6,22 @@ use App\Models\Setting;
 
 class SettingRepositoryImplement implements SettingRepository
 {
-    
     public function getFirst()
     {
         return Setting::first();
     }
 
-
-    /**
-     * Get website setting.
-     */
-    public function getSetting()
+    public function findById(int $id)
     {
-        return Setting::first();
+        return Setting::findOrFail($id);
     }
 
-
-    /**
-     * Update website setting.
-     */
-    public function update(array $data)
-    {
-        $setting = Setting::first();
-
-        if (!$setting) {
-            return null;
-        }
+    public function update(
+        int $id,
+        array $data
+    ) {
+        
+        $setting = Setting::findOrFail($id);
 
         $setting->update($data);
 
