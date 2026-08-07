@@ -99,10 +99,9 @@
                             class="relative overflow-hidden">
 
                             <img
-                                src="{{ asset($gallery->image ?: 'storage/gallery/default.jpg') }}"
+                                src="{{ $gallery->image ? Storage::url($gallery->image) : asset('storage/gallery/default.jpg') }}"
                                 alt="{{ $gallery->title }}"
                                 class="h-80 w-full object-cover transition duration-700 group-hover:scale-110">
-
                             <div
                                 class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-900/10 to-transparent opacity-0 transition duration-500 group-hover:opacity-100">
                             </div>
@@ -221,7 +220,8 @@
 
 
                                 <a
-                                    href="{{ asset($gallery->image ?: 'storage/gallery/default.jpg') }}"
+                                    <a
+    href="{{ $gallery->image ? Storage::url($gallery->image) : asset('storage/gallery/default.jpg') }}"
                                     target="_blank"
                                     class="inline-flex items-center gap-2 font-semibold text-blue-600 transition hover:text-blue-700">
 

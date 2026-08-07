@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit FAQ')
+@section('title', 'Tambah FAQ')
 
 @section('content')
 
@@ -29,14 +29,14 @@
                 <h1
                     class="mt-4 text-3xl font-black">
 
-                    Edit FAQ
+                    Tambah FAQ
 
                 </h1>
 
                 <p
                     class="mt-2 max-w-2xl text-sm text-blue-100">
 
-                    Perbarui informasi pertanyaan dan jawaban FAQ yang ditampilkan pada halaman utama website LPK Bina Insani.
+                    Tambahkan pertanyaan dan jawaban baru yang akan ditampilkan pada halaman utama website LPK Bina Insani.
 
                 </p>
 
@@ -67,7 +67,7 @@
             <p
                 class="mt-1 text-sm text-slate-500">
 
-                Ubah informasi FAQ sesuai kebutuhan.
+                Lengkapi seluruh informasi berikut.
 
             </p>
 
@@ -78,12 +78,11 @@
 
 
         <form
-            action="{{ route('faqs.update', $faq->id) }}"
+            action="{{ route('faqs.store') }}"
             method="POST"
             class="space-y-8 p-8">
 
             @csrf
-            @method('PUT')
 
             {{-- Pertanyaan --}}
             <div>
@@ -98,7 +97,7 @@
                 <input
                     type="text"
                     name="question"
-                    value="{{ old('question', $faq->question) }}"
+                    value="{{ old('question') }}"
                     placeholder="Contoh: Berapa lama masa pelatihan?"
                     class="w-full rounded-2xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
 
@@ -113,6 +112,7 @@
                 @enderror
 
             </div>
+
                         {{-- Jawaban --}}
             <div>
 
@@ -127,7 +127,7 @@
                     name="answer"
                     rows="8"
                     placeholder="Masukkan jawaban FAQ..."
-                    class="w-full rounded-2xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('answer', $faq->answer) }}</textarea>
+                    class="w-full rounded-2xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">{{ old('answer') }}</textarea>
 
                 @error('answer')
 
@@ -161,7 +161,7 @@
                     <input
                         type="text"
                         name="category"
-                        value="{{ old('category', $faq->category) }}"
+                        value="{{ old('category') }}"
                         placeholder="Contoh: Pendaftaran"
                         class="w-full rounded-2xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
 
@@ -193,7 +193,7 @@
                     <input
                         type="number"
                         name="sort_order"
-                        value="{{ old('sort_order', $faq->sort_order) }}"
+                        value="{{ old('sort_order', 0) }}"
                         min="0"
                         class="w-full rounded-2xl border-slate-300 focus:border-blue-500 focus:ring-blue-500">
 
@@ -245,8 +245,7 @@
                 </label>
 
             </div>
-
-            {{-- Action --}}
+                        {{-- Action --}}
             <div
                 class="flex flex-col-reverse gap-4 border-t border-slate-200 pt-8 sm:flex-row sm:justify-start">
 
@@ -254,7 +253,7 @@
                     type="submit"
                     class="rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow transition hover:bg-blue-700 hover:-translate-y-0.5">
 
-                    Update FAQ
+                    Simpan FAQ
 
                 </button>
 

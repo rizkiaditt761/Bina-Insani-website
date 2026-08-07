@@ -22,9 +22,21 @@ class GalleryController extends Controller
     {
         $galleries = $this->galleryService->getAll();
 
+        $total = $galleries->count();
+
+        $active = $galleries->where('is_active', true)->count();
+
+        $inactive = $galleries->where('is_active', false)->count();
+
+
         return view(
             'admin.gallery.index',
-            compact('galleries')
+            compact(
+                'galleries',
+                'total',
+                'active',
+                'inactive'
+            )
         );
     }
 
@@ -51,7 +63,9 @@ class GalleryController extends Controller
 
             'image' => [
                 'nullable',
-                'string'
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
             ],
 
             'sort_order' => [
@@ -65,16 +79,29 @@ class GalleryController extends Controller
             ],
         ]);
 
+        
+
 
         $data['is_active'] = $request->has('is_active');
+
+
+        if ($request->hasFile('image')) {
+
+            $data['image'] = $request
+                ->file('image')
+                ->store('gallery', 'public');
+
+        }
 
 
         $this->galleryService->create($data);
 
 
-        return back()->with(
-            'success',
-            'Gallery berhasil ditambahkan'
+        return redirect()
+             ->route('galleries.index')
+            ->with(
+                'success',
+                'Gallery berhasil ditambahkan'
         );
     }
 
@@ -84,7 +111,17 @@ class GalleryController extends Controller
         $gallery = $this->galleryService->findById($id);
 
         return view(
-            'admin.galleries.edit',
+            'admin.gallery.edit',
+            compact('gallery')
+        );
+    }
+
+    public function show(int $id)
+    {
+        $gallery = $this->galleryService->findById($id);
+
+        return view(
+            'admin.gallery.show',
             compact('gallery')
         );
     }
@@ -115,7 +152,9 @@ class GalleryController extends Controller
 
             'image' => [
                 'nullable',
-                'string'
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
             ],
 
             'sort_order' => [
@@ -129,6 +168,13 @@ class GalleryController extends Controller
             ],
         ]);
 
+        if ($request->hasFile('image')) {
+
+            $data['image'] = $request
+                ->file('image')
+                ->store('gallery', 'public');
+
+        }
 
         $this->galleryService->update(
             $id,
@@ -136,9 +182,11 @@ class GalleryController extends Controller
         );
 
 
-        return back()->with(
-            'success',
-            'Gallery berhasil diperbarui'
+        return redirect()
+            ->route('galleries.index')
+            ->with(
+                'success',
+                'Gallery berhasil diperbarui'
         );
     }
 
@@ -151,6 +199,13 @@ class GalleryController extends Controller
         return back()->with(
             'success',
             'Gallery berhasil dihapus'
+        );
+    }
+
+    public function create()
+    {
+        return view(
+            'admin.gallery.create'
         );
     }
 }

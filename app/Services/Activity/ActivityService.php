@@ -15,6 +15,8 @@ interface ActivityService
     public function log(
         string $module,
         string $action,
-        string $description
+        string $description,
+        $subject = null,
+        array $properties = []
     );
 }

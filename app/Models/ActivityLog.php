@@ -14,14 +14,12 @@ class ActivityLog extends Model
      */
     protected $fillable = [
         'user_id',
-
         'module',
         'action',
         'description',
-
+        'properties',
         'subject_type',
         'subject_id',
-
         'ip_address',
         'user_agent',
     ];
@@ -34,7 +32,9 @@ class ActivityLog extends Model
      */
     protected $casts = [
         'subject_id' => 'integer',
+        'properties' => 'array',
     ];
+    
 
 
     /**

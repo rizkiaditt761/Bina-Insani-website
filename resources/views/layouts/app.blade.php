@@ -69,12 +69,13 @@
         class="min-h-full flex flex-col">
 
 
-        <div
-            class="flex-1 p-6 lg:p-8">
+        <div class="flex-1 p-6 lg:p-8">
 
+            <div class="pb-8">
 
-            @yield('content')
+                @yield('content')
 
+            </div>
 
         </div>
 

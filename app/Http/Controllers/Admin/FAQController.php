@@ -22,9 +22,33 @@ class FAQController extends Controller
     {
         $faqs = $this->faqService->getAll();
 
+        $total = $faqs->count();
+        $active = $faqs->where('is_active', true)->count();
+        $inactive = $faqs->where('is_active', false)->count();
+
         return view(
             'admin.faq.index',
-            compact('faqs')
+            compact(
+                'faqs',
+                'total',
+                'active',
+                'inactive'
+            )
+        );
+    }
+
+    public function create()
+    {
+        return view('admin.faq.create');
+    }
+
+    public function show(int $id)
+    {
+        $faq = $this->faqService->findById($id);
+
+        return view(
+            'admin.faq.show',
+            compact('faq')
         );
     }
 
@@ -59,9 +83,11 @@ class FAQController extends Controller
         $this->faqService->create($data);
 
 
-        return back()->with(
-            'success',
-            'FAQ berhasil ditambahkan'
+        return redirect()
+            ->route('faqs.index')
+            ->with(
+                'success',
+                'FAQ berhasil ditambahkan.'
         );
     }
 
@@ -114,9 +140,11 @@ class FAQController extends Controller
         );
 
 
-        return back()->with(
-            'success',
-            'FAQ berhasil diperbarui'
+        return redirect()
+            ->route('faqs.index')
+            ->with(
+                'success',
+                'FAQ berhasil diperbarui.'
         );
     }
 

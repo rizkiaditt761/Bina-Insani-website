@@ -18,11 +18,12 @@
     {{-- ========================================================= --}}
     {{-- PAGE HEADER --}}
     {{-- ========================================================= --}}
-    <section
-        class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 p-8 text-white shadow-xl">
+    
+    <div
+        class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 p-6 text-white shadow-xl">
 
         <div
-            class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+            class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl">
         </div>
 
         <div
@@ -30,74 +31,32 @@
 
             <div>
 
-                
+                <span
+                    class="inline-flex rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-blue-100">
+
+                    Website Management
+
+                </span>
 
                 <h1
-                    class="text-3xl font-bold">
+                    class="mt-4 text-3xl font-black">
 
                     Pengaturan Website
 
                 </h1>
 
                 <p
-                    class="mt-3 max-w-2xl text-sm leading-7 text-blue-100">
+                    class="mt-2 max-w-2xl text-sm text-blue-100">
 
-                    Kelola seluruh informasi website LPK Bina Insani mulai dari
-                    identitas website, landing page, kontak, pembayaran,
-                    sosial media hingga footer dalam satu halaman.
+                    Kelola seluruh informasi website LPK Bina Insani mulai dari identitas website, landing page, kontak, pembayaran, sosial media hingga footer dalam satu halaman.
 
                 </p>
 
             </div>
 
-
-
-            <div
-                class="grid grid-cols-2 gap-4">
-
-                <div
-                    class="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-
-                    <p
-                        class="text-xs uppercase tracking-widest text-blue-100">
-
-                        Status
-
-                    </p>
-
-                    <h3
-                        class="mt-2 text-lg font-semibold">
-
-                        Aktif
-
-                    </h3>
-
-                </div>
-
-                <div
-                    class="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-
-                    <p
-                        class="text-xs uppercase tracking-widest text-blue-100">
-
-                        Module
-
-                    </p>
-
-                    <h3
-                        class="mt-2 text-lg font-semibold">
-
-                        Settings
-
-                    </h3>
-
-                </div>
-
-            </div>
-
         </div>
 
-    </section>
+    </div>
 
 
 

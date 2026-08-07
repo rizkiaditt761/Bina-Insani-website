@@ -22,9 +22,21 @@ class ClassController extends Controller
     {
         $classes = $this->classService->getAll();
 
+        $total = $classes->count();
+
+        $active = $classes->where('is_active', true)->count();
+
+        $inactive = $classes->where('is_active', false)->count();
+
+
         return view(
             'admin.classes.index',
-            compact('classes')
+            compact(
+                'classes',
+                'total',
+                'active',
+                'inactive'
+            )
         );
     }
 

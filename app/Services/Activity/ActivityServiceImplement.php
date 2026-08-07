@@ -42,9 +42,13 @@ class ActivityServiceImplement implements ActivityService
     public function log(
         string $module,
         string $action,
-        string $description
-    ) {
+        string $description,
+        $subject = null,
+        array $properties = []
+    )
+    {
         return $this->activityRepository->create([
+
             'user_id' => auth()->id(),
 
             'module' => $module,
@@ -52,6 +56,22 @@ class ActivityServiceImplement implements ActivityService
             'action' => $action,
 
             'description' => $description,
+
+
+            'subject_type' => $subject
+                ? get_class($subject)
+                : null,
+
+
+            'subject_id' => $subject?->id,
+
+
+            'properties' => $properties,
+
+            'ip_address' => request()->ip(),
+
+            'user_agent' => request()->userAgent(),
+
         ]);
     }
 }

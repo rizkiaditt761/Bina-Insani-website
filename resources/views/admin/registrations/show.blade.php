@@ -784,22 +784,7 @@
 
 
 
-{{-- BACK BUTTON --}}
-<div class="flex justify-end">
 
-
-    <a
-        href="{{ route('registrations.index') }}"
-        class="rounded-xl bg-slate-800 px-6 py-3 font-semibold text-white transition hover:bg-slate-900">
-
-
-        Kembali ke Data Pendaftar
-
-
-    </a>
-
-
-</div>
 
 
 

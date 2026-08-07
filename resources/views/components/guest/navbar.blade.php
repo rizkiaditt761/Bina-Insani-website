@@ -110,7 +110,7 @@
 
 
                         <a
-                            href="#{{ $id }}"
+                            href="{{ route('home') }}#{{ $id }}"
                             class="rounded-lg
                                    px-3
                                    py-2
@@ -276,7 +276,7 @@
 
 
                         <a
-                            href="#{{ $id }}"
+                            href="{{ route('home') }}#{{ $id }}"
                             @click="open=false"
                             class="rounded-xl
                                    px-4

@@ -154,7 +154,7 @@ class SettingController extends Controller
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:4096',
+                'max:7096',
             ],
 
             'about_title' => [
@@ -171,7 +171,7 @@ class SettingController extends Controller
             'about_alumni_count' => [
                 'nullable',
                 'string',
-                'max:10',
+                'max:4',
             ],
 
             'bank_name' => [
@@ -209,11 +209,7 @@ class SettingController extends Controller
             $data
         );
 
-        $this->activityService->log(
-            'Setting',
-            'Update',
-            'Memperbarui pengaturan website.'
-        );
+        
 
         return redirect()
             ->route('settings.index')
