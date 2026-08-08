@@ -18,6 +18,21 @@
 
     </title>
 
+    @if($setting?->favicon)
+
+        <link
+            rel="icon"
+            type="image/png"
+            href="{{ asset('storage/'.$setting->favicon) }}?v={{ time() }}">
+
+    @else
+
+        <link
+            rel="icon"
+            href="{{ asset('favicon.ico') }}">
+
+    @endif
+
 
     @vite([
         'resources/css/app.css',
