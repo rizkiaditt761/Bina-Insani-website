@@ -77,6 +77,12 @@ Route::controller(RegistrationController::class)
         )->name('registration.show');
 
 
+        
+        Route::post(
+            '/registration/{registrationNumber}/cancel',
+            [RegistrationController::class, 'cancel']
+        )->name('registration.cancel');
+
     });
 
 

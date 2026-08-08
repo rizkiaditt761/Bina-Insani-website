@@ -71,7 +71,7 @@
                     </p>
 
 
-                    @switch($registration->status)
+                    @switch($registration->display_status)
 
                         @case('waiting_payment')
 
@@ -84,7 +84,18 @@
 
                             @break
 
-                        
+
+                        @case('expired')
+
+                            <span
+                                class="mt-3 inline-flex rounded-full bg-red-100 px-5 py-2 font-semibold text-red-700">
+
+                                Pendaftaran Expired
+
+                            </span>
+
+                            @break
+
 
                         @case('payment_rejected')
 
@@ -141,19 +152,25 @@
 
 
                 @if(
-                    in_array($registration->status, [
+                    in_array($registration->display_status, [
                         'waiting_payment',
                         'payment_rejected'
                     ])
                 )
 
                     <a
-                        href="{{ route('registration.payment.create',$registration->registration_number) }}"
-                        class="rounded-xl bg-blue-600 px-7 py-3 text-center font-bold text-white shadow-lg transition hover:bg-blue-700">
+                        href="{{ route(
+                            'registration.payment.create',
+                            $registration->registration_number
+                        ) }}"
+                        class="rounded-xl mt-6 bg-blue-600 px-7 py-3 text-center font-bold text-white shadow-lg transition hover:bg-blue-700">
 
                         @if(
                             $registration->payments->isNotEmpty() &&
-                            $registration->payments->sortByDesc('created_at')->first()->status === 'rejected'
+                            $registration->payments
+                                ->sortByDesc('created_at')
+                                ->first()
+                                ->status === 'rejected'
                         )
 
                             Upload Ulang Bukti Pembayaran
@@ -165,6 +182,34 @@
                         @endif
 
                     </a>
+
+                @endif
+
+
+                @if($registration->display_status === 'waiting_payment')
+
+                    <form
+                        action="{{ route(
+                            'registration.cancel',
+                            $registration->registration_number
+                        ) }}"
+                        method="POST"
+                        class="inline mt-6"
+                        onsubmit="return confirm(
+                            'Apakah kamu yakin ingin membatalkan pendaftaran ini? Pendaftaran yang sudah dibatalkan tidak dapat dilanjutkan.'
+                        )">
+
+                        @csrf
+
+                        <button
+                            type="submit"
+                            class="rounded-xl border border-red-200 bg-red-50 px-7 py-3 font-bold text-red-600 transition hover:bg-red-100">
+
+                            Batalkan Pendaftaran
+
+                        </button>
+
+                    </form>
 
                 @endif
 

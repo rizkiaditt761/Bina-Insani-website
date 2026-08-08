@@ -351,79 +351,95 @@ Action
 
 
 {{-- CEK PAYMENT TERLEBIH DAHULU --}}
-@if($registration->payment && $registration->payment->status === 'rejected')
+@if(
+    $registration->payment &&
+    $registration->payment->status === 'rejected'
+)
 
+    <span
+        class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
 
-<span
-class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
+        Payment Rejected
 
-Payment Rejected
-
-</span>
-
-
+    </span>
 
 @else
 
+    @switch($registration->display_status)
 
-@switch($registration->status)
+        @case('waiting_payment')
 
+            <span
+                class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">
 
+                Waiting Payment
 
-@case('waiting_payment')
+            </span>
 
-<span
-class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">
-
-Waiting Payment
-
-</span>
-
-@break
+        @break
 
 
+        @case('waiting_verification')
 
-@case('waiting_verification')
+            <span
+                class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
 
-<span
-class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+                Waiting Verification
 
-Waiting Verification
+            </span>
 
-</span>
-
-@break
-
+        @break
 
 
-@case('accepted')
+        @case('accepted')
 
-<span
-class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+            <span
+                class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
 
-Accepted
+                Accepted
 
-</span>
+            </span>
 
-@break
-
-
-
-@case('rejected')
-
-<span
-class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
-
-Rejected
-
-</span>
-
-@break
+        @break
 
 
+        @case('rejected')
 
-@endswitch
+            <span
+                class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700">
 
+                Rejected
+
+            </span>
+
+        @break
+
+
+        @case('cancelled')
+
+            <span
+                class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+
+                Cancelled
+
+            </span>
+
+        @break
+
+
+        @case('expired')
+
+            <span
+                class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-500">
+
+                Expired
+
+            </span>
+
+        @break
+
+
+    @endswitch
 
 @endif
 

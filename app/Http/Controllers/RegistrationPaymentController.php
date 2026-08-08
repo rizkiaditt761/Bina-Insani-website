@@ -36,6 +36,18 @@ class RegistrationPaymentController extends Controller
 
         abort_if(!$registration, 404);
 
+        if ($registration->display_status === 'expired') {
+            return redirect()
+                ->route(
+                    'registration.show',
+                    $registration->registration_number
+                )
+                ->with(
+                    'error',
+                    'Batas waktu pembayaran pendaftaran sudah berakhir.'
+                );
+        }
+
         return view(
             'registration-payment.create',
             compact(
@@ -67,6 +79,15 @@ class RegistrationPaymentController extends Controller
             ->findByRegistrationNumber($registrationNumber);
 
         abort_if(!$registration, 404);
+
+        if ($registration->display_status === 'expired') {
+            return redirect()
+                ->route('registration.show', $registration->id)
+                ->with(
+                    'error',
+                    'Batas waktu pembayaran pendaftaran sudah berakhir.'
+                );
+        }
 
         $this->registrationPaymentService->uploadPayment(
             $registration->id,

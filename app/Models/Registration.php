@@ -39,6 +39,8 @@ class Registration extends Model
 
         'status',
         'notes',
+
+        'payment_deadline',
     ];
 
 
@@ -50,6 +52,8 @@ class Registration extends Model
     protected $casts = [
         'birth_date' => 'date',
         'graduation_year' => 'integer',
+
+        'payment_deadline' => 'datetime',
     ];
 
 
@@ -81,5 +85,18 @@ class Registration extends Model
             RegistrationPayment::class,
             'registration_id'
         );
+    }
+
+    public function getDisplayStatusAttribute(): string
+    {
+        if (
+            $this->status === 'waiting_payment' &&
+            $this->payment_deadline &&
+            $this->payment_deadline->isPast()
+        ) {
+            return 'expired';
+        }
+
+        return $this->status;
     }
 }
