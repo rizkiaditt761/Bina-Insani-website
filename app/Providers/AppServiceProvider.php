@@ -49,6 +49,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+
+        $this->app->bind(
+            \App\Repositories\Profile\ProfileRepository::class,
+            \App\Repositories\Profile\ProfileRepositoryImplement::class
+        );
+
+        $this->app->bind(
+            \App\Services\Profile\ProfileService::class,
+            \App\Services\Profile\ProfileServiceImplement::class
+        );
+
         $this->app->bind(
             SettingRepository::class,
             SettingRepositoryImplement::class

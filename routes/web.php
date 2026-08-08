@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\FAQController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\RegistrationPaymentController as AdminRegistrationPaymentController;
 use App\Http\Controllers\Admin\ActivityController;
-
+use App\Http\Controllers\Admin\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -130,6 +130,16 @@ Route::prefix('admin')
     ->middleware(['auth'])
     ->group(function () {
 
+
+        Route::get(
+            '/profile',
+            [ProfileController::class, 'index']
+        )->name('admin.profile');
+
+        Route::put(
+            '/profile',
+            [ProfileController::class, 'update']
+        )->name('admin.profile.update');
 
 
         Route::post('/notifications/{notification}/read', function ($notification) {

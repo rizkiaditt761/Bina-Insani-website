@@ -291,9 +291,16 @@
 
                 {{-- Avatar --}}
                 <div
-                    class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow">
+                    class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-sm font-bold text-white shadow">
 
-                    {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    @if (auth()->user()->profile_photo)
+                        <img
+                            src="{{ asset('storage/' . auth()->user()->profile_photo) }}"
+                            alt="{{ auth()->user()->name }}"
+                            class="h-full w-full object-cover">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
+                    @endif
 
                 </div>
 
