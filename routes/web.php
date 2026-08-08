@@ -132,6 +132,24 @@ Route::prefix('admin')
 
 
 
+        Route::post('/notifications/{notification}/read', function ($notification) {
+
+            $notification = auth()->user()
+                ->notifications()
+                ->where('id', $notification)
+                ->firstOrFail();
+
+            $notification->markAsRead();
+
+            return redirect(
+                $notification->data['url']
+                ?? route('admin.dashboard')
+            );
+
+        })->name('notifications.read');
+
+
+
         Route::get(
             '/',
             [DashboardController::class, 'index']

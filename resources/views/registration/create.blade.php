@@ -4,6 +4,24 @@
 
 @section('content')
 
+@if ($errors->any())
+    <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4">
+
+        <p class="font-bold text-red-700">
+            Pendaftaran gagal:
+        </p>
+
+        <ul class="mt-2 list-disc pl-5 text-sm text-red-600">
+
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+
+        </ul>
+
+    </div>
+@endif
+
 <section
     class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 py-24">
 

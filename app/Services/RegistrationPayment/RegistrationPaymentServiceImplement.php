@@ -5,6 +5,8 @@ namespace App\Services\RegistrationPayment;
 use App\Repositories\RegistrationPayment\RegistrationPaymentRepository;
 use App\Services\Registration\RegistrationService;
 use Illuminate\Http\UploadedFile;
+use App\Models\User;
+use App\Notifications\AdminPaymentNotification;
 
 class RegistrationPaymentServiceImplement implements RegistrationPaymentService
 {
@@ -89,20 +91,16 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
         int $registrationId,
         UploadedFile $file
     ) {
-
         $registration = $this->registrationService
             ->findById($registrationId);
-
 
         $path = $file->store(
             'registration-payments',
             'public'
         );
 
-
         $payment = $this->registrationPaymentRepository
             ->createOrUpdate([
-
                 'registration_id' => $registrationId,
 
                 'payment_method' => 'QRIS',
@@ -116,9 +114,7 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
                 'status' => 'waiting_verification',
 
                 'rejection_reason' => null,
-
             ]);
-
 
         $this->registrationService
             ->update(
@@ -128,6 +124,12 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
                 ]
             );
 
+        // Kirim notifikasi pembayaran ke admin
+        User::all()->each(function ($user) use ($payment) {
+            $user->notify(
+                new AdminPaymentNotification($payment)
+            );
+        });
 
         return $payment;
     }

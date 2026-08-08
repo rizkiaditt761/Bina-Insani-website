@@ -41,39 +41,36 @@ class RegistrationController extends Controller
             'classes'
         ));
     }
-    /**
-     * Save Registration
-     */
-    public function store(Request $request)
-    {
-        
-  
-   
 
+    public function store(Request $request)
+{
     $validated = $request->validate([
         'course_class_id' => 'required|exists:classes,id',
 
-         'full_name' => 'required|string|max:255',
-         'email' => 'required|email|max:255|unique:registrations,email',
-         'phone' => 'required|string|max:20|unique:registrations,phone',
-         'gender' => 'required|in:Laki-laki,Perempuan',
-         'birth_date' => 'required|date',
-         'city' => 'required|string|max:255',
-         'address' => 'required|string',
+        'full_name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:registrations,email',
+        'phone' => 'required|string|max:20|unique:registrations,phone',
+        'gender' => 'required|in:Laki-laki,Perempuan',
+        'birth_date' => 'required|date',
+        'city' => 'required|string|max:255',
+        'address' => 'required|string',
 
-         'last_education' => 'required|string',
-         'school_name' => 'required|string|max:255',
-         'graduation_year' => 'required|digits:4',
+        'last_education' => 'required|string',
+        'school_name' => 'required|string|max:255',
+        'graduation_year' => 'required|digits:4',
 
-         'ktp_file' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-         'diploma_file' => 'required|mimes:pdf,jpg,jpeg,png|max:4096',
-         'photo_file' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
+        'ktp_file' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        'diploma_file' => 'required|mimes:pdf,jpg,jpeg,png|max:4096',
+        'photo_file' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-    
-    
+    /*
+    |--------------------------------------------------------------------------
+    | Upload file
+    |--------------------------------------------------------------------------
+    */
 
-        $validated['ktp_file'] = $request
+    $validated['ktp_file'] = $request
         ->file('ktp_file')
         ->store('registrations/ktp', 'public');
 
@@ -84,12 +81,22 @@ class RegistrationController extends Controller
     $validated['photo_file'] = $request
         ->file('photo_file')
         ->store('registrations/photo', 'public');
-         
-    
 
-        $registration = $this->registrationService->create($validated);
+    /*
+    |--------------------------------------------------------------------------
+    | Create registration
+    |--------------------------------------------------------------------------
+    */
 
-        return redirect()
+    $registration = $this->registrationService->create($validated);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect success
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()
         ->route(
             'registration.success',
             $registration->registration_number
@@ -99,8 +106,8 @@ class RegistrationController extends Controller
             true,
             60 * 24 * 30
         );
-       
-    }
+}
+    
 
     public function checkForm()
     {

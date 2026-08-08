@@ -59,8 +59,6 @@ class RegistrationRepositoryImplement implements RegistrationRepository
      */
     public function create(array $data)
     {
-        $data['status'] = 'waiting_payment';
-
         $data['payment_deadline'] = now()->addDays(2);
 
         return Registration::create($data);

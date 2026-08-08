@@ -4,6 +4,8 @@ namespace App\Services\Registration;
 
 use App\Repositories\Registration\RegistrationRepository;
 use Illuminate\Support\Str;
+use App\Models\User;
+use App\Notifications\AdminRegistrationNotification;
 
 class RegistrationServiceImplement implements RegistrationService
 {
@@ -38,11 +40,25 @@ class RegistrationServiceImplement implements RegistrationService
 
     public function create(array $data)
     {
-        $data['registration_number'] = $this->generateRegistrationNumber();
+        $data['registration_number'] =
+            $this->generateRegistrationNumber();
 
         $data['status'] = 'waiting_payment';
 
-        return $this->registrationRepository->create($data);
+        $data['payment_deadline'] =
+            now()->addDays(2);
+
+        $registration =
+            $this->registrationRepository->create($data);
+
+        // Kirim notifikasi ke admin
+        User::all()->each(function ($user) use ($registration) {
+            $user->notify(
+                new AdminRegistrationNotification($registration)
+            );
+        });
+
+        return $registration;
     }
 
 
