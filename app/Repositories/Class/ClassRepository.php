@@ -4,7 +4,7 @@ namespace App\Repositories\Class;
 
 interface ClassRepository
 {
-    public function getAll();
+    public function getAll(array $filters = []);
 
     public function findById(int $id);
 

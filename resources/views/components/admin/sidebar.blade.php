@@ -1,5 +1,5 @@
 <aside
-    class="flex h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-white">
+    class="flex h-screen w-64 shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-white">
 
     {{-- BRAND --}}
     <div
@@ -60,9 +60,7 @@
 
     {{-- NAVIGATION --}}
     <nav
-        class="flex-1 overflow-y-auto px-3 py-4">
-
-
+        class="sidebar-scroll flex-1 overflow-y-auto px-3 py-4">
         <ul class="space-y-2">
 
 

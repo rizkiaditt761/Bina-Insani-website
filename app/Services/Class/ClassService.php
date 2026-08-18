@@ -4,7 +4,9 @@ namespace App\Services\Class;
 
 interface ClassService
 {
-    public function getAll();
+    public function getAll(array $filters = []);
+
+    public function getStatistics();
 
     public function findById(int $id);
 

@@ -1,19 +1,15 @@
 <?php
 
-
 namespace App\Services\FAQ;
-
 
 use App\Repositories\FAQ\FAQRepository;
 use App\Services\Activity\ActivityService;
-
 
 class FAQServiceImplement implements FAQService
 {
     protected FAQRepository $faqRepository;
 
     protected ActivityService $activityService;
-
 
 
     public function __construct(
@@ -25,12 +21,15 @@ class FAQServiceImplement implements FAQService
     }
 
 
-
-    public function getAll()
-    {
-        return $this->faqRepository->getAll();
+    public function getAll(
+        ?string $search = null,
+        ?string $status = null
+    ) {
+        return $this->faqRepository->getAll(
+            $search,
+            $status
+        );
     }
-
 
 
     public function findById(int $id)
@@ -39,17 +38,92 @@ class FAQServiceImplement implements FAQService
     }
 
 
-
     public function create(array $data)
     {
-        $faq = $this->faqRepository->create($data);
+        /*
+        |--------------------------------------------------------------------------
+        | Tentukan posisi
+        |--------------------------------------------------------------------------
+        */
 
+        $sortOrder = (int) ($data['sort_order'] ?? 1);
+
+        if ($sortOrder < 1) {
+            $sortOrder = 1;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Geser FAQ lama
+        |--------------------------------------------------------------------------
+        */
+
+        $this->faqRepository->shiftForCreate(
+            $sortOrder
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Simpan FAQ baru
+        |--------------------------------------------------------------------------
+        */
+
+        $data['sort_order'] = $sortOrder;
+
+        $faq = $this->faqRepository->create(
+            $data
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Rapikan urutan
+        |--------------------------------------------------------------------------
+        */
+
+        $this->faqRepository->normalizeOrder();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Activity Log
+        |--------------------------------------------------------------------------
+        */
 
         $this->activityService->log(
             'faq',
             'create',
             'Menambahkan FAQ: ' . $faq->question,
-            $faq
+            $faq,
+            [
+                'changes' => [
+                    [
+                        'field' => 'question',
+                        'old' => null,
+                        'new' => $faq->question,
+                    ],
+
+                    [
+                        'field' => 'answer',
+                        'old' => null,
+                        'new' => $faq->answer,
+                    ],
+
+                    [
+                        'field' => 'sort_order',
+                        'old' => null,
+                        'new' => $faq->sort_order,
+                    ],
+
+                    [
+                        'field' => 'is_active',
+                        'old' => null,
+                        'new' => $faq->is_active,
+                    ],
+                ],
+            ]
         );
 
 
@@ -57,90 +131,129 @@ class FAQServiceImplement implements FAQService
     }
 
 
+    public function update(
+        int $id,
+        array $data
+    ) {
+        $oldFaq = $this->faqRepository->findById($id);
+
+        $oldSortOrder = (int) $oldFaq->sort_order;
+
+        $newSortOrder = array_key_exists(
+            'sort_order',
+            $data
+        )
+            ? (int) $data['sort_order']
+            : $oldSortOrder;
 
 
+        if ($newSortOrder < 1) {
+            $newSortOrder = 1;
+        }
 
-    public function update(int $id, array $data)
-    {
-        $faq = $this->faqRepository->findById($id);
 
+        /*
+        |--------------------------------------------------------------------------
+        | Track perubahan
+        |--------------------------------------------------------------------------
+        */
 
         $changes = [];
-
 
         $fields = [
             'question',
             'answer',
-            'status',
+            'sort_order',
+            'is_active',
         ];
 
 
         foreach ($fields as $field) {
 
             if (
-                isset($data[$field]) &&
-                $faq->$field != $data[$field]
+                array_key_exists($field, $data) &&
+                $oldFaq->$field != $data[$field]
             ) {
 
                 $changes[] = [
-
                     'field' => $field,
-
-                    'old' => $faq->$field,
-
+                    'old' => $oldFaq->$field,
                     'new' => $data[$field],
-
                 ];
-
             }
-
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Atur ulang posisi
+        |--------------------------------------------------------------------------
+        */
 
-        $updatedFaq = $this->faqRepository->update(
+        if ($oldSortOrder !== $newSortOrder) {
+
+            $this->faqRepository->shiftForUpdate(
+                $id,
+                $oldSortOrder,
+                $newSortOrder
+            );
+
+            $data['sort_order'] = $newSortOrder;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update FAQ
+        |--------------------------------------------------------------------------
+        */
+
+        $faq = $this->faqRepository->update(
             $id,
             $data
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Rapikan urutan
+        |--------------------------------------------------------------------------
+        */
 
-        if (
-            $updatedFaq &&
-            count($changes)
-        ) {
-
-
-            $this->activityService->log(
-
-                'faq',
-
-                'update',
-
-                'Memperbarui FAQ',
-
-                $updatedFaq,
-
-                [
-                    'changes' => $changes
-                ]
-
-            );
-
-        }
+        $this->faqRepository->normalizeOrder();
 
 
-        return $updatedFaq;
+        /*
+        |--------------------------------------------------------------------------
+        | Activity Log
+        |--------------------------------------------------------------------------
+        */
+
+        $this->activityService->log(
+            'faq',
+            'update',
+            'Memperbarui FAQ: ' . $faq->question,
+            $faq,
+            [
+                'changes' => $changes,
+            ]
+        );
+
+
+        return $faq;
     }
-
-
-
 
 
     public function delete(int $id)
     {
         $faq = $this->faqRepository->findById($id);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Activity Log
+        |--------------------------------------------------------------------------
+        */
 
         $this->activityService->log(
             'faq',
@@ -150,15 +263,48 @@ class FAQServiceImplement implements FAQService
         );
 
 
-        return $this->faqRepository->delete($id);
+        /*
+        |--------------------------------------------------------------------------
+        | Delete
+        |--------------------------------------------------------------------------
+        */
+
+        $result = $this->faqRepository->delete($id);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Rapikan nomor urutan
+        |--------------------------------------------------------------------------
+        */
+
+        $this->faqRepository->normalizeOrder();
+
+
+        return $result;
     }
-
-
-
 
 
     public function getActive()
     {
         return $this->faqRepository->getActive();
+    }
+
+
+    public function countTotal()
+    {
+        return $this->faqRepository->countTotal();
+    }
+
+
+    public function countActive()
+    {
+        return $this->faqRepository->countActive();
+    }
+
+
+    public function countInactive()
+    {
+        return $this->faqRepository->countInactive();
     }
 }

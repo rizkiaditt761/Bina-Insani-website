@@ -18,13 +18,19 @@ class FAQController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
-        $faqs = $this->faqService->getAll();
+        $faqs = $this->faqService->getAll(
+            $request->search,
+            $request->status
+        );
 
-        $total = $faqs->count();
-        $active = $faqs->where('is_active', true)->count();
-        $inactive = $faqs->where('is_active', false)->count();
+        $total = $this->faqService->countTotal();
+
+        $active = $this->faqService->countActive();
+
+        $inactive = $this->faqService->countInactive();
+
 
         return view(
             'admin.faq.index',
@@ -37,10 +43,12 @@ class FAQController extends Controller
         );
     }
 
+
     public function create()
     {
         return view('admin.faq.create');
     }
+
 
     public function show(int $id)
     {
@@ -68,17 +76,54 @@ class FAQController extends Controller
                 'string'
             ],
 
+            'category' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
+
             'sort_order' => [
                 'nullable',
-                'integer'
+                'integer',
+                'min:1'
             ],
 
             'is_active' => [
                 'nullable',
                 'boolean'
             ],
+
         ]);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Checkbox
+        |--------------------------------------------------------------------------
+        */
+
+        $data['is_active'] = $request->has('is_active');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default position
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            !isset($data['sort_order']) ||
+            $data['sort_order'] < 1
+        ) {
+            $data['sort_order'] = $this->faqService->countTotal() + 1;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Insert FAQ ke posisi yang dipilih
+        |--------------------------------------------------------------------------
+        */
 
         $this->faqService->create($data);
 
@@ -88,14 +133,13 @@ class FAQController extends Controller
             ->with(
                 'success',
                 'FAQ berhasil ditambahkan.'
-        );
+            );
     }
 
 
     public function edit(int $id)
     {
         $faq = $this->faqService->findById($id);
-
 
         return view(
             'admin.faq.edit',
@@ -122,17 +166,54 @@ class FAQController extends Controller
                 'string'
             ],
 
+            'category' => [
+                'nullable',
+                'string',
+                'max:255'
+            ],
+
             'sort_order' => [
                 'nullable',
-                'integer'
+                'integer',
+                'min:1'
             ],
 
             'is_active' => [
                 'nullable',
                 'boolean'
             ],
+
         ]);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Checkbox
+        |--------------------------------------------------------------------------
+        */
+
+        $data['is_active'] = $request->has('is_active');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default position
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            !isset($data['sort_order']) ||
+            $data['sort_order'] < 1
+        ) {
+            $data['sort_order'] = 1;
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update + atur ulang urutan
+        |--------------------------------------------------------------------------
+        */
 
         $this->faqService->update(
             $id,
@@ -145,7 +226,7 @@ class FAQController extends Controller
             ->with(
                 'success',
                 'FAQ berhasil diperbarui.'
-        );
+            );
     }
 
 
@@ -156,7 +237,7 @@ class FAQController extends Controller
 
         return back()->with(
             'success',
-            'FAQ berhasil dihapus'
+            'FAQ berhasil dihapus.'
         );
     }
 }

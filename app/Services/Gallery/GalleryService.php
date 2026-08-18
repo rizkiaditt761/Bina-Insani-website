@@ -4,7 +4,10 @@ namespace App\Services\Gallery;
 
 interface GalleryService
 {
-    public function getAll();
+    public function getAll(
+        ?string $search = null,
+        ?string $status = null
+    );
 
     public function findById(int $id);
 
@@ -15,4 +18,10 @@ interface GalleryService
     public function delete(int $id);
 
     public function getActive();
+
+    public function countTotal();
+
+    public function countActive();
+
+    public function countInactive();
 }

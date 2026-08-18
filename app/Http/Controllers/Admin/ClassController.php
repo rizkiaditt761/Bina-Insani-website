@@ -18,15 +18,34 @@ class ClassController extends Controller
     }
 
 
-    public function index()
+    /**
+     * Display classes.
+     */
+    public function index(Request $request)
     {
-        $classes = $this->classService->getAll();
+        $filters = [
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
+        ];
 
-        $total = $classes->count();
 
-        $active = $classes->where('is_active', true)->count();
+        $classes = $this->classService->getAll($filters);
 
-        $inactive = $classes->where('is_active', false)->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistics
+        |--------------------------------------------------------------------------
+        */
+
+        $statistics = $this->classService->getStatistics();
+
+
+        $total = $statistics['total'];
+
+        $active = $statistics['active'];
+
+        $inactive = $statistics['inactive'];
 
 
         return view(
@@ -41,45 +60,113 @@ class ClassController extends Controller
     }
 
 
+    /**
+     * Show create form.
+     */
+    public function create()
+    {
+        return view('admin.classes.create');
+    }
+
+
+    /**
+     * Store class.
+     */
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $data = $request->validate(
+            [
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
 
-            'name' => [
-                'required',
-                'string',
-                'max:255'
+                'registration_fee' => [
+                    'required',
+                    'numeric',
+                    'min:0',
+                ],
+
+                'duration' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                ],
+
+                'meeting_schedule' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                ],
+
+                'description' => [
+                    'nullable',
+                    'string',
+                ],
+
+                'is_active' => [
+                    'required',
+                    'boolean',
+                ],
             ],
+            [
+                'name.required' =>
+                    'Nama program wajib diisi.',
 
-            'registration_fee' => [
-                'required',
-                'numeric'
-            ],
+                'name.string' =>
+                    'Nama program harus berupa teks.',
 
-            'duration' => [
-                'nullable',
-                'string'
-            ],
+                'name.max' =>
+                    'Nama program maksimal 255 karakter.',
 
-            'meeting_schedule' => [
-                'nullable',
-                'string'
-            ],
+                'registration_fee.required' =>
+                    'Biaya pendaftaran wajib diisi.',
 
-            'description' => [
-                'nullable',
-                'string'
-            ],
+                'registration_fee.numeric' =>
+                    'Biaya pendaftaran hanya boleh berupa angka.',
 
-            'is_active' => [
-                'nullable',
-                'boolean'
-            ],
-        ]);
+                'registration_fee.min' =>
+                    'Biaya pendaftaran tidak boleh kurang dari 0.',
 
+                'duration.string' =>
+                    'Durasi harus berupa teks.',
+
+                'duration.max' =>
+                    'Durasi maksimal 255 karakter.',
+
+                'meeting_schedule.string' =>
+                    'Jadwal pertemuan harus berupa teks.',
+
+                'meeting_schedule.max' =>
+                    'Jadwal pertemuan maksimal 255 karakter.',
+
+                'description.string' =>
+                    'Deskripsi harus berupa teks.',
+
+                'is_active.required' =>
+                    'Status program wajib dipilih.',
+
+                'is_active.boolean' =>
+                    'Status program tidak valid.',
+            ]
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status Program
+        |--------------------------------------------------------------------------
+        */
+
+        $data['is_active'] = $request->boolean('is_active');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create Program
+        |--------------------------------------------------------------------------
+        */
 
         $this->classService->create($data);
-
 
         return redirect()
             ->route('classes.index')
@@ -90,15 +177,13 @@ class ClassController extends Controller
     }
 
 
-    public function create()
-    {
-        return view('admin.classes.create');
-    }
-
-
+    /**
+     * Show edit form.
+     */
     public function edit(int $id)
     {
         $class = $this->classService->findById($id);
+
 
         return view(
             'admin.classes.edit',
@@ -107,64 +192,126 @@ class ClassController extends Controller
     }
 
 
+    /**
+     * Update class.
+     */
     public function update(
         Request $request,
         int $id
     ) {
+        $data = $request->validate(
+            [
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                ],
 
-        $data = $request->validate([
+                'registration_fee' => [
+                    'required',
+                    'numeric',
+                    'min:0',
+                ],
 
-            'name' => [
-                'required',
-                'string',
-                'max:255'
+                'duration' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                ],
+
+                'meeting_schedule' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                ],
+
+                'description' => [
+                    'nullable',
+                    'string',
+                ],
+
+                'is_active' => [
+                    'required',
+                    'boolean',
+                ],
             ],
+            [
+                'name.required' =>
+                    'Nama program wajib diisi.',
 
-            'registration_fee' => [
-                'required',
-                'numeric'
-            ],
+                'name.string' =>
+                    'Nama program harus berupa teks.',
 
-            'duration' => [
-                'nullable',
-                'string'
-            ],
+                'name.max' =>
+                    'Nama program maksimal 255 karakter.',
 
-            'meeting_schedule' => [
-                'nullable',
-                'string'
-            ],
+                'registration_fee.required' =>
+                    'Biaya pendaftaran wajib diisi.',
 
-            'description' => [
-                'nullable',
-                'string'
-            ],
+                'registration_fee.numeric' =>
+                    'Biaya pendaftaran hanya boleh berupa angka.',
 
-            'is_active' => [
-                'nullable',
-                'boolean'
-            ],
-        ]);
+                'registration_fee.min' =>
+                    'Biaya pendaftaran tidak boleh kurang dari 0.',
 
+                'duration.string' =>
+                    'Durasi harus berupa teks.',
+
+                'duration.max' =>
+                    'Durasi maksimal 255 karakter.',
+
+                'meeting_schedule.string' =>
+                    'Jadwal pertemuan harus berupa teks.',
+
+                'meeting_schedule.max' =>
+                    'Jadwal pertemuan maksimal 255 karakter.',
+
+                'description.string' =>
+                    'Deskripsi harus berupa teks.',
+
+                'is_active.required' =>
+                    'Status program wajib dipilih.',
+
+                'is_active.boolean' =>
+                    'Status program tidak valid.',
+            ]
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status Program
+        |--------------------------------------------------------------------------
+        */
+
+        $data['is_active'] = $request->boolean('is_active');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Update Program
+        |--------------------------------------------------------------------------
+        */
 
         $this->classService->update(
             $id,
             $data
         );
 
-
         return redirect()
             ->route('classes.index')
             ->with(
                 'success',
                 'Program berhasil diperbarui.'
-        );
+            );
     }
 
 
+    /**
+     * Show class detail.
+     */
     public function show(int $id)
     {
         $class = $this->classService->findById($id);
+
 
         return view(
             'admin.classes.show',
@@ -173,9 +320,22 @@ class ClassController extends Controller
     }
 
 
+    /**
+     * Delete class.
+     */
     public function destroy(int $id)
     {
-        $this->classService->delete($id);
+        $result = $this->classService->delete($id);
+
+
+        if (!$result['success']) {
+            return redirect()
+                ->route('classes.index')
+                ->with(
+                    'error',
+                    $result['message']
+                );
+        }
 
 
         return redirect()
@@ -183,6 +343,6 @@ class ClassController extends Controller
             ->with(
                 'success',
                 'Program berhasil dihapus.'
-         );
+            );
     }
 }

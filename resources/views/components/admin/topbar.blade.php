@@ -361,11 +361,10 @@
                 </div>
 
 
-                {{-- Profile Coming Soon --}}
-                <button
-                    type="button"
-                    disabled
-                    class="flex w-full cursor-not-allowed items-center gap-3 px-5 py-3 text-left text-sm text-slate-400">
+                {{-- Profile --}}
+                <a
+                    href="{{ route('admin.profile') }}"
+                    class="flex w-full items-center gap-3 px-5 py-3 text-left text-sm font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-600">
 
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -382,13 +381,11 @@
 
                     </svg>
 
-                    Profile
-
-                    <span class="ml-auto text-xs">
-                        Soon
+                    <span>
+                        Profile
                     </span>
 
-                </button>
+                </a>
 
 
                 {{-- Logout --}}

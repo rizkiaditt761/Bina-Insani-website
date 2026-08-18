@@ -18,15 +18,21 @@ class GalleryController extends Controller
     }
 
 
-    public function index()
+    /**
+     * Display gallery listing.
+     */
+    public function index(Request $request)
     {
-        $galleries = $this->galleryService->getAll();
+        $galleries = $this->galleryService->getAll(
+            $request->input('search'),
+            $request->input('status')
+        );
 
-        $total = $galleries->count();
+        $total = $this->galleryService->countTotal();
 
-        $active = $galleries->where('is_active', true)->count();
+        $active = $this->galleryService->countActive();
 
-        $inactive = $galleries->where('is_active', false)->count();
+        $inactive = $this->galleryService->countInactive();
 
 
         return view(
@@ -41,6 +47,18 @@ class GalleryController extends Controller
     }
 
 
+    /**
+     * Show create form.
+     */
+    public function create()
+    {
+        return view('admin.gallery.create');
+    }
+
+
+    /**
+     * Store gallery.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -48,42 +66,59 @@ class GalleryController extends Controller
             'title' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
             'category' => [
                 'nullable',
-                'string'
+                'string',
+                'max:255',
             ],
 
             'description' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'image' => [
-                'nullable',
+                'required',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048'
+                'max:2048',
             ],
 
             'sort_order' => [
                 'nullable',
-                'integer'
+                'integer',
+                'min:0',
             ],
 
             'is_active' => [
                 'nullable',
-                'boolean'
+                'boolean',
             ],
+
         ]);
 
-        
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default values
+        |--------------------------------------------------------------------------
+        */
+
+        $data['is_active'] =
+            $request->boolean('is_active');
+
+        $data['sort_order'] =
+            $request->input('sort_order', 0);
 
 
-        $data['is_active'] = $request->has('is_active');
-
+        /*
+        |--------------------------------------------------------------------------
+        | Upload image
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->hasFile('image')) {
 
@@ -98,27 +133,21 @@ class GalleryController extends Controller
 
 
         return redirect()
-             ->route('galleries.index')
+            ->route('galleries.index')
             ->with(
                 'success',
-                'Gallery berhasil ditambahkan'
-        );
+                'Gallery berhasil ditambahkan.'
+            );
     }
 
 
-    public function edit(int $id)
-    {
-        $gallery = $this->galleryService->findById($id);
-
-        return view(
-            'admin.gallery.edit',
-            compact('gallery')
-        );
-    }
-
+    /**
+     * Show gallery detail.
+     */
     public function show(int $id)
     {
         $gallery = $this->galleryService->findById($id);
+
 
         return view(
             'admin.gallery.show',
@@ -127,46 +156,86 @@ class GalleryController extends Controller
     }
 
 
+    /**
+     * Show edit form.
+     */
+    public function edit(int $id)
+    {
+        $gallery = $this->galleryService->findById($id);
+
+
+        return view(
+            'admin.gallery.edit',
+            compact('gallery')
+        );
+    }
+
+
+    /**
+     * Update gallery.
+     */
     public function update(
         Request $request,
         int $id
     ) {
-
         $data = $request->validate([
 
             'title' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
             'category' => [
                 'nullable',
-                'string'
+                'string',
+                'max:255',
             ],
 
             'description' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'image' => [
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048'
+                'max:2048',
             ],
 
             'sort_order' => [
                 'nullable',
-                'integer'
+                'integer',
+                'min:0',
             ],
 
             'is_active' => [
                 'nullable',
-                'boolean'
+                'boolean',
             ],
+
         ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Default values
+        |--------------------------------------------------------------------------
+        */
+
+        $data['is_active'] =
+            $request->boolean('is_active');
+
+        $data['sort_order'] =
+            $request->input('sort_order', 0);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload new image
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->hasFile('image')) {
 
@@ -175,6 +244,7 @@ class GalleryController extends Controller
                 ->store('gallery', 'public');
 
         }
+
 
         $this->galleryService->update(
             $id,
@@ -186,26 +256,24 @@ class GalleryController extends Controller
             ->route('galleries.index')
             ->with(
                 'success',
-                'Gallery berhasil diperbarui'
-        );
+                'Gallery berhasil diperbarui.'
+            );
     }
 
 
+    /**
+     * Delete gallery.
+     */
     public function destroy(int $id)
     {
         $this->galleryService->delete($id);
 
 
-        return back()->with(
-            'success',
-            'Gallery berhasil dihapus'
-        );
-    }
-
-    public function create()
-    {
-        return view(
-            'admin.gallery.create'
-        );
+        return redirect()
+            ->route('galleries.index')
+            ->with(
+                'success',
+                'Gallery berhasil dihapus.'
+            );
     }
 }

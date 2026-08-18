@@ -4,39 +4,73 @@
 
 @section('content')
 
-<div class="space-y-6">
+<div class="space-y-6 pb-8">
 
-    {{-- Header --}}
-    <div class="flex items-center justify-between">
+    {{-- ========================================================= --}}
+    {{-- HEADER --}}
+    {{-- ========================================================= --}}
+    <div
+        class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 p-6 text-white shadow-xl">
 
-        <div>
-
-            <h1 class="text-2xl font-bold text-slate-800">
-
-                Tambah Program
-
-            </h1>
-
-            <p class="mt-1 text-sm text-slate-500">
-
-                Tambahkan program pelatihan baru yang akan ditampilkan pada website LPK Bina Insani.
-
-            </p>
-
+        <div
+            class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-3xl">
         </div>
 
-        <a
-            href="{{ route('classes.index') }}"
-            class="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+        <div
+            class="absolute -bottom-12 left-1/3 h-40 w-40 rounded-full bg-blue-400/10 blur-3xl">
+        </div>
 
-            Kembali
+        <div
+            class="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
-        </a>
+            <div>
+
+                <span
+                    class="inline-flex rounded-full bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-blue-100">
+
+                    Classes Management
+
+                </span>
+
+                <h1
+                    class="mt-4 text-3xl font-black tracking-tight">
+
+                    Tambah Program
+
+                </h1>
+
+                <p
+                    class="mt-2 max-w-2xl text-sm leading-6 text-blue-100">
+
+                    Tambahkan program pelatihan baru yang akan ditampilkan
+                    pada website LPK Bina Insani.
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <a
+                    href="{{ route('classes.index') }}"
+                    class="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20">
+
+                    Kembali
+
+                </a>
+
+            </div>
+
+        </div>
 
     </div>
 
 
-    {{-- Form --}}
+
+    {{-- ========================================================= --}}
+    {{-- FORM --}}
+    {{-- ========================================================= --}}
     <form
         action="{{ route('classes.store') }}"
         method="POST"
