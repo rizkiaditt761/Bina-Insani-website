@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\Activity\ActivityService;
-use Carbon\Carbon;
 
 class ActivityController extends Controller
 {
@@ -18,18 +17,37 @@ class ActivityController extends Controller
     }
 
 
+    /**
+     * Display activity logs.
+     */
     public function index()
     {
         $activities = $this->activityService->getAll();
 
+        /*
+        |--------------------------------------------------------------------------
+        | Statistics
+        |--------------------------------------------------------------------------
+        |
+        | Untuk sementara statistik tetap dihitung dari collection agar
+        | tidak mengubah kontrak service/repository yang sudah berjalan.
+        | Nanti setelah kita lihat service & repository, kalau memungkinkan
+        | kita pindahkan perhitungannya ke database agar lebih efisien.
+        |
+        */
+
         $total = $activities->count();
 
         $today = $activities
-            ->where('created_at', '>=', Carbon::today())
+            ->filter(function ($activity) {
+                return $activity->created_at?->isToday();
+            })
             ->count();
 
         $thisMonth = $activities
-            ->where('created_at', '>=', Carbon::now()->startOfMonth())
+            ->filter(function ($activity) {
+                return $activity->created_at?->isSameMonth(now());
+            })
             ->count();
 
         $totalModules = $activities
@@ -38,22 +56,32 @@ class ActivityController extends Controller
             ->unique()
             ->count();
 
+
         return view(
             'admin.activities.index',
-            compact(
-                'activities',
-                'total',
-                'today',
-                'thisMonth',
-                'totalModules'
-            )
+            [
+                'activities' => $activities,
+                'total' => $total,
+                'today' => $today,
+                'thisMonth' => $thisMonth,
+                'totalModules' => $totalModules,
+            ]
         );
     }
 
 
+    /**
+     * Display a single activity.
+     */
     public function show(int $id)
     {
         $activity = $this->activityService->findById($id);
+
+        abort_if(
+            !$activity,
+            404,
+            'Aktivitas tidak ditemukan.'
+        );
 
 
         return view(
@@ -63,14 +91,27 @@ class ActivityController extends Controller
     }
 
 
+    /**
+     * Delete an activity.
+     */
     public function destroy(int $id)
     {
+        $activity = $this->activityService->findById($id);
+
+        abort_if(
+            !$activity,
+            404,
+            'Aktivitas tidak ditemukan.'
+        );
+
         $this->activityService->delete($id);
 
 
-        return back()->with(
-            'success',
-            'Aktivitas berhasil dihapus'
-        );
+        return redirect()
+            ->route('activities.index')
+            ->with(
+                'success',
+                'Aktivitas berhasil dihapus.'
+            );
     }
 }

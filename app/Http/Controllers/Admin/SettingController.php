@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class SettingController extends Controller
 {
     protected SettingService $settingService;
+
     protected ActivityService $activityService;
 
     public function __construct(
@@ -33,9 +34,15 @@ class SettingController extends Controller
     public function update(
         Request $request,
         int $id
-        
     ) {
         $data = $request->validate([
+
+            /*
+            |--------------------------------------------------------------------------
+            | Website Identity
+            |--------------------------------------------------------------------------
+            */
+
             'site_name' => [
                 'required',
                 'string',
@@ -51,8 +58,22 @@ class SettingController extends Controller
 
             'favicon' => [
                 'nullable',
-                'mimes:png,jpg,ico,webp',
+                'image',
+                'mimes:png,jpg,jpeg,ico,webp',
                 'max:1024',
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Hero Section
+            |--------------------------------------------------------------------------
+            */
+
+            'hero_badge' => [
+                'nullable',
+                'string',
+                'max:255',
             ],
 
             'hero_title' => [
@@ -66,23 +87,56 @@ class SettingController extends Controller
                 'string',
             ],
 
-            'hero_badge' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
             'hero_success_number' => [
                 'nullable',
                 'string',
                 'max:50',
             ],
-            
 
-            'description' => [
+            'hero_image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:4096',
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | About Section
+            |--------------------------------------------------------------------------
+            */
+
+            'about_title' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'about_description' => [
                 'nullable',
                 'string',
             ],
+
+            'about_alumni_count' => [
+                'nullable',
+                'string',
+                'max:50',
+            ],
+
+            'about_image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:7096',
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Contact
+            |--------------------------------------------------------------------------
+            */
 
             'address' => [
                 'nullable',
@@ -112,12 +166,44 @@ class SettingController extends Controller
                 'string',
             ],
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Payment
+            |--------------------------------------------------------------------------
+            */
+
             'qris_image' => [
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
                 'max:4096',
             ],
+
+            'bank_name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'bank_account_name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'bank_account_number' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Social Media
+            |--------------------------------------------------------------------------
+            */
 
             'facebook' => [
                 'nullable',
@@ -143,54 +229,12 @@ class SettingController extends Controller
                 'max:255',
             ],
 
-            'hero_image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:4096',
-            ],
 
-            'about_image' => [
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:7096',
-            ],
-
-            'about_title' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'about_description' => [
-                'nullable',
-                'string',
-            ],
-
-            'about_alumni_count' => [
-                'nullable',
-                'string',
-                'max:4',
-            ],
-
-            'bank_name' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'bank_account_name' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'bank_account_number' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
+            /*
+            |--------------------------------------------------------------------------
+            | Footer
+            |--------------------------------------------------------------------------
+            */
 
             'footer_description' => [
                 'nullable',
@@ -202,14 +246,13 @@ class SettingController extends Controller
                 'string',
                 'max:255',
             ],
+
         ]);
 
         $this->settingService->update(
-            (int) $id,
+            $id,
             $data
         );
-
-        
 
         return redirect()
             ->route('settings.index')

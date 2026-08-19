@@ -20,7 +20,6 @@ class SettingRepositoryImplement implements SettingRepository
         int $id,
         array $data
     ) {
-        
         $setting = Setting::findOrFail($id);
 
         $setting->update($data);

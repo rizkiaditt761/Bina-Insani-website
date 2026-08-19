@@ -34,7 +34,6 @@ class ActivityLog extends Model
         'subject_id' => 'integer',
         'properties' => 'array',
     ];
-    
 
 
     /**

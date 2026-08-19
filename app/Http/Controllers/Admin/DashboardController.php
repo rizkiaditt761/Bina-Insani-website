@@ -27,11 +27,6 @@ class DashboardController extends Controller
             'waiting_payment'
         )->count();
 
-        $waitingVerification = Registration::where(
-            'status',
-            'waiting_verification'
-        )->count();
-
         $acceptedRegistrations = Registration::where(
             'status',
             'accepted'
@@ -42,7 +37,15 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         | PAYMENT
         |--------------------------------------------------------------------------
+        |
+        | Status pembayaran diambil dari registration_payments.
+        |
         */
+
+        $waitingVerification = RegistrationPayment::where(
+            'status',
+            'waiting_verification'
+        )->count();
 
         $verifiedPayments = RegistrationPayment::where(
             'status',
@@ -75,7 +78,6 @@ class DashboardController extends Controller
         $registrationChartLabels = [];
 
         $registrationChartData = [];
-
 
         for ($i = 6; $i >= 0; $i--) {
 

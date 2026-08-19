@@ -12,7 +12,6 @@ class SettingServiceImplement implements SettingService
 
     protected ActivityService $activityService;
 
-
     public function __construct(
         SettingRepository $settingRepository,
         ActivityService $activityService
@@ -22,22 +21,31 @@ class SettingServiceImplement implements SettingService
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Get Setting
+    |--------------------------------------------------------------------------
+    */
+
     public function getFirst()
     {
         return $this->settingRepository->getFirst();
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | Update Setting
+    |--------------------------------------------------------------------------
+    */
+
     public function update(
         int $id,
         array $data
     ) {
-
         $setting = $this->settingRepository->findById($id);
 
-
         $changes = [];
-
 
 
         /*
@@ -48,49 +56,140 @@ class SettingServiceImplement implements SettingService
 
         $textFields = [
 
+            // Website Identity
             'site_name',
+
+            // Hero
             'hero_badge',
             'hero_title',
             'hero_subtitle',
+            'hero_success_number',
+
+            // About
             'about_title',
             'about_description',
+            'about_alumni_count',
+
+            // Contact
             'address',
             'phone',
             'whatsapp',
             'email',
+            'google_maps',
+
+            // Payment
             'bank_name',
             'bank_account_name',
             'bank_account_number',
+
+            // Social Media
+            'facebook',
+            'instagram',
+            'youtube',
+            'tiktok',
+
+            // Footer
             'footer_description',
+            'copyright',
 
         ];
 
 
-
         foreach ($textFields as $field) {
 
-
             if (
-                isset($data[$field]) &&
-                $setting->$field != $data[$field]
+                array_key_exists($field, $data) &&
+                $setting->{$field} != $data[$field]
             ) {
-
-
                 $changes[] = [
-
                     'field' => $field,
-
-                    'old' => $setting->$field,
-
+                    'old' => $setting->{$field},
                     'new' => $data[$field],
-
                 ];
-
             }
-
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Image Upload Helper
+        |--------------------------------------------------------------------------
+        |
+        | File baru disimpan terlebih dahulu.
+        | Setelah berhasil, file lama baru dihapus.
+        |
+        */
+
+        $handleImageUpload = function (
+            string $field,
+            string $directory
+        ) use (
+            &$data,
+            &$changes,
+            $setting
+        ) {
+
+            if (
+                !isset($data[$field]) ||
+                !$data[$field]
+            ) {
+                unset($data[$field]);
+
+                return;
+            }
+
+
+            $oldFile = $setting->{$field};
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Store New File
+            |--------------------------------------------------------------------------
+            */
+
+            $newFile = $data[$field]->store(
+                $directory,
+                'public'
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Data
+            |--------------------------------------------------------------------------
+            */
+
+            $data[$field] = $newFile;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Activity Change
+            |--------------------------------------------------------------------------
+            */
+
+            $changes[] = [
+                'field' => $field,
+                'old' => $oldFile,
+                'new' => $newFile,
+            ];
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Delete Old File
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $oldFile &&
+                $oldFile !== $newFile &&
+                Storage::disk('public')->exists($oldFile)
+            ) {
+                Storage::disk('public')->delete($oldFile);
+            }
+        };
 
 
         /*
@@ -99,46 +198,10 @@ class SettingServiceImplement implements SettingService
         |--------------------------------------------------------------------------
         */
 
-        if (isset($data['logo']) && $data['logo']) {
-
-
-            if (
-                $setting->logo &&
-                Storage::disk('public')->exists($setting->logo)
-            ) {
-
-                
-
-            }
-
-
-
-            $data['logo'] = $data['logo']->store(
-                'settings/logo',
-                'public'
-            );
-
-
-
-            $changes[] = [
-
-                'field' => 'logo',
-
-                'old' => $setting->logo,
-
-                'new' => $data['logo'],
-
-            ];
-
-
-        } else {
-
-            unset($data['logo']);
-
-        }
-
-
-
+        $handleImageUpload(
+            'logo',
+            'settings/logo'
+        );
 
 
         /*
@@ -147,46 +210,10 @@ class SettingServiceImplement implements SettingService
         |--------------------------------------------------------------------------
         */
 
-        if (isset($data['favicon']) && $data['favicon']) {
-
-
-            if (
-                $setting->favicon &&
-                Storage::disk('public')->exists($setting->favicon)
-            ) {
-
-                
-
-            }
-
-
-
-            $data['favicon'] = $data['favicon']->store(
-                'settings/favicon',
-                'public'
-            );
-
-
-
-            $changes[] = [
-
-                'field' => 'favicon',
-
-                'old' => $setting->favicon,
-
-                'new' => $data['favicon'],
-
-            ];
-
-
-        } else {
-
-            unset($data['favicon']);
-
-        }
-
-
-
+        $handleImageUpload(
+            'favicon',
+            'settings/favicon'
+        );
 
 
         /*
@@ -195,46 +222,10 @@ class SettingServiceImplement implements SettingService
         |--------------------------------------------------------------------------
         */
 
-        if (isset($data['hero_image']) && $data['hero_image']) {
-
-
-            if (
-                $setting->hero_image &&
-                Storage::disk('public')->exists($setting->hero_image)
-            ) {
-
-            
-
-            }
-
-
-
-            $data['hero_image'] = $data['hero_image']->store(
-                'settings/hero',
-                'public'
-            );
-
-
-
-            $changes[] = [
-
-                'field' => 'hero_image',
-
-                'old' => $setting->hero_image,
-
-                'new' => $data['hero_image'],
-
-            ];
-
-
-        } else {
-
-            unset($data['hero_image']);
-
-        }
-
-
-
+        $handleImageUpload(
+            'hero_image',
+            'settings/hero'
+        );
 
 
         /*
@@ -243,46 +234,10 @@ class SettingServiceImplement implements SettingService
         |--------------------------------------------------------------------------
         */
 
-        if (isset($data['about_image']) && $data['about_image']) {
-
-
-            if (
-                $setting->about_image &&
-                Storage::disk('public')->exists($setting->about_image)
-            ) {
-
-                
-
-            }
-
-
-
-            $data['about_image'] = $data['about_image']->store(
-                'settings/about',
-                'public'
-            );
-
-
-
-            $changes[] = [
-
-                'field' => 'about_image',
-
-                'old' => $setting->about_image,
-
-                'new' => $data['about_image'],
-
-            ];
-
-
-        } else {
-
-            unset($data['about_image']);
-
-        }
-
-
-
+        $handleImageUpload(
+            'about_image',
+            'settings/about'
+        );
 
 
         /*
@@ -291,46 +246,10 @@ class SettingServiceImplement implements SettingService
         |--------------------------------------------------------------------------
         */
 
-        if (isset($data['qris_image']) && $data['qris_image']) {
-
-
-            if (
-                $setting->qris_image &&
-                Storage::disk('public')->exists($setting->qris_image)
-            ) {
-
-            
-
-            }
-
-
-
-            $data['qris_image'] = $data['qris_image']->store(
-                'settings/qris',
-                'public'
-            );
-
-
-
-            $changes[] = [
-
-                'field' => 'qris_image',
-
-                'old' => $setting->qris_image,
-
-                'new' => $data['qris_image'],
-
-            ];
-
-
-        } else {
-
-            unset($data['qris_image']);
-
-        }
-
-
-
+        $handleImageUpload(
+            'qris_image',
+            'settings/qris'
+        );
 
 
         /*
@@ -345,10 +264,6 @@ class SettingServiceImplement implements SettingService
         );
 
 
-
-
-
-
         /*
         |--------------------------------------------------------------------------
         | Activity Log
@@ -357,9 +272,8 @@ class SettingServiceImplement implements SettingService
 
         if (
             $updatedSetting &&
-            count($changes)
+            count($changes) > 0
         ) {
-
 
             $this->activityService->log(
 
@@ -372,19 +286,13 @@ class SettingServiceImplement implements SettingService
                 $updatedSetting,
 
                 [
-
-                    'changes' => $changes
-
+                    'changes' => $changes,
                 ]
 
             );
-
         }
 
 
-
-
         return $updatedSetting;
-
     }
 }
