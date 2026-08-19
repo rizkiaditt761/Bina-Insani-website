@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\RegistrationPayment\RegistrationPaymentService;
 use App\Services\Activity\ActivityService;
+use App\Services\RegistrationPayment\RegistrationPaymentService;
 use Illuminate\Http\Request;
 
 class RegistrationPaymentController extends Controller
 {
     protected RegistrationPaymentService $registrationPaymentService;
+
     protected ActivityService $activityService;
 
 
@@ -17,13 +18,16 @@ class RegistrationPaymentController extends Controller
         RegistrationPaymentService $registrationPaymentService,
         ActivityService $activityService
     ) {
-        $this->registrationPaymentService = $registrationPaymentService;
-        $this->activityService = $activityService;
+        $this->registrationPaymentService =
+            $registrationPaymentService;
+
+        $this->activityService =
+            $activityService;
     }
 
 
     /**
-     * Payment List
+     * Daftar pembayaran.
      */
     public function index(Request $request)
     {
@@ -33,23 +37,30 @@ class RegistrationPaymentController extends Controller
         ]);
 
 
-        $payments = $this->registrationPaymentService
-            ->getAll($filters);
+        $payments =
+            $this->registrationPaymentService
+                ->getAll($filters);
 
 
-        $pending = $this->registrationPaymentService
-            ->getPending()
-            ->count();
+        $pending =
+            $this->registrationPaymentService
+                ->getPendingCount();
 
 
-        $verified = $this->registrationPaymentService
-            ->getVerified()
-            ->count();
+        $verified =
+            $this->registrationPaymentService
+                ->getVerifiedCount();
 
 
-        $rejected = $this->registrationPaymentService
-            ->getRejected()
-            ->count();
+        $rejected =
+            $this->registrationPaymentService
+                ->getRejectedCount();
+
+
+        $total =
+            $pending +
+            $verified +
+            $rejected;
 
 
         return view(
@@ -58,23 +69,21 @@ class RegistrationPaymentController extends Controller
                 'payments',
                 'pending',
                 'verified',
-                'rejected'
+                'rejected',
+                'total'
             )
         );
     }
 
 
-
     /**
-     * Payment Detail
+     * Detail pembayaran.
      */
     public function show(int $id)
     {
-        $payment = $this->registrationPaymentService
-            ->findById($id);
-
-
-        abort_if(!$payment, 404);
+        $payment =
+            $this->registrationPaymentService
+                ->findById($id);
 
 
         return view(
@@ -84,10 +93,8 @@ class RegistrationPaymentController extends Controller
     }
 
 
-
     /**
-     * Manual Create Payment
-     * (Optional untuk admin)
+     * Manual create payment.
      */
     public function store(Request $request)
     {
@@ -95,27 +102,30 @@ class RegistrationPaymentController extends Controller
 
             'registration_id' => [
                 'required',
-                'exists:registrations,id'
+                'integer',
+                'exists:registrations,id',
             ],
 
             'payment_method' => [
                 'required',
-                'string'
+                'string',
+                'max:100',
             ],
 
             'amount' => [
                 'required',
-                'numeric'
+                'numeric',
+                'min:0',
             ],
 
             'payment_proof' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'status' => [
                 'nullable',
-                'in:waiting_verification,approved,rejected'
+                'in:waiting_verification,verified,rejected',
             ],
 
             'rejection_reason' => [
@@ -139,20 +149,21 @@ class RegistrationPaymentController extends Controller
     }
 
 
-
     /**
-     * Update Payment
+     * Update payment.
+     *
+     * Method ini dipertahankan untuk kebutuhan
+     * administrasi manual.
      */
     public function update(
         Request $request,
         int $id
     ) {
-
         $data = $request->validate([
 
             'status' => [
                 'required',
-                'in:waiting_verification,approved,rejected'
+                'in:waiting_verification,verified,rejected',
             ],
 
             'rejection_reason' => [
@@ -164,11 +175,12 @@ class RegistrationPaymentController extends Controller
         ]);
 
 
-        $this->registrationPaymentService
-            ->update(
-                $id,
-                $data
-            );
+        $payment =
+            $this->registrationPaymentService
+                ->update(
+                    $id,
+                    $data
+                );
 
 
         return back()
@@ -179,9 +191,8 @@ class RegistrationPaymentController extends Controller
     }
 
 
-
     /**
-     * Delete Payment
+     * Delete payment.
      */
     public function destroy(int $id)
     {
@@ -197,50 +208,56 @@ class RegistrationPaymentController extends Controller
     }
 
 
-
     /**
-     * Approve Payment
+     * Approve / verify payment.
      */
     public function approve(int $id)
     {
+        $payment =
+            $this->registrationPaymentService
+                ->approve(
+                    $id,
+                    auth()->id()
+                );
 
-        $payment = $this->registrationPaymentService
-            ->approve(
-                $id,
-                auth()->id()
+
+        /*
+         * Jika payment sudah pernah diproses,
+         * jangan membuat activity log approve ulang.
+         */
+        if ($payment->status === 'verified') {
+
+            $this->activityService->log(
+
+                'Registration Payment',
+
+                'Approve',
+
+                'Menyetujui pembayaran ' .
+                $payment->registration
+                    ->registration_number
+
             );
 
-
-        $this->activityService->log(
-
-            'Registration Payment',
-
-            'Approve',
-
-            'Menyetujui pembayaran ' .
-            $payment->registration->registration_number
-
-        );
+        }
 
 
         return back()
             ->with(
                 'success',
-                'Pembayaran berhasil disetujui.'
+                'Pembayaran berhasil diverifikasi.'
             );
     }
 
 
-
     /**
-     * Reject Payment
+     * Reject payment.
      */
     public function reject(
         Request $request,
         int $id
     ) {
-
-        $request->validate([
+        $data = $request->validate([
 
             'rejection_reason' => [
                 'required',
@@ -251,27 +268,34 @@ class RegistrationPaymentController extends Controller
         ]);
 
 
+        $payment =
+            $this->registrationPaymentService
+                ->reject(
+                    $id,
+                    auth()->id(),
+                    $data['rejection_reason']
+                );
 
-        $payment = $this->registrationPaymentService
-            ->reject(
-                $id,
-                auth()->id(),
-                $request->rejection_reason
+
+        /*
+         * Activity log hanya dibuat setelah
+         * payment benar-benar rejected.
+         */
+        if ($payment->status === 'rejected') {
+
+            $this->activityService->log(
+
+                'Registration Payment',
+
+                'Reject',
+
+                'Menolak pembayaran ' .
+                $payment->registration
+                    ->registration_number
+
             );
 
-
-
-        $this->activityService->log(
-
-            'Registration Payment',
-
-            'Reject',
-
-            'Menolak pembayaran ' .
-            $payment->registration->registration_number
-
-        );
-
+        }
 
 
         return back()

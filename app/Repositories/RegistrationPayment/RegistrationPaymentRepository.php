@@ -26,12 +26,12 @@ interface RegistrationPaymentRepository
     public function reject(
         int $id,
         int $verifiedBy,
-        ?string $notes = null
+        ?string $rejectionReason = null
     );
 
-    public function getPending();
+    public function getPendingCount(): int;
 
-    public function getVerified();
+    public function getVerifiedCount(): int;
 
-    public function getRejected();
+    public function getRejectedCount(): int;
 }

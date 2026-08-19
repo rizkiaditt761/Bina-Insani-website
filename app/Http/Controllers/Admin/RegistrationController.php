@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class RegistrationController extends Controller
 {
-
     protected RegistrationService $registrationService;
 
 
@@ -20,16 +19,21 @@ class RegistrationController extends Controller
     }
 
 
-
     /**
      * Registration List
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+
+        $status = $request->input('status');
+
 
         $registrations = $this->registrationService
-            ->getAll();
-
+            ->getAll(
+                $search,
+                $status
+            );
 
 
         $total = Registration::count();
@@ -53,7 +57,6 @@ class RegistrationController extends Controller
         )->count();
 
 
-
         return view(
             'admin.registrations.index',
             compact(
@@ -64,11 +67,7 @@ class RegistrationController extends Controller
                 'accepted'
             )
         );
-
     }
-
-
-
 
 
     /**
@@ -76,10 +75,8 @@ class RegistrationController extends Controller
      */
     public function show(int $id)
     {
-
         $registration = $this->registrationService
             ->findById($id);
-
 
 
         return view(
@@ -88,11 +85,7 @@ class RegistrationController extends Controller
                 'registration'
             )
         );
-
     }
-
-
-
 
 
     /**
@@ -100,7 +93,6 @@ class RegistrationController extends Controller
      */
     public function store(Request $request)
     {
-
         $data = $request->validate([
 
             'course_class_id' => [
@@ -108,69 +100,57 @@ class RegistrationController extends Controller
                 'exists:classes,id'
             ],
 
-
             'full_name' => [
                 'required',
                 'string',
                 'max:255'
             ],
 
-
             'email' => [
                 'required',
                 'email'
             ],
-
 
             'phone' => [
                 'required',
                 'string'
             ],
 
-
             'gender' => [
                 'required'
             ],
-
 
             'birth_date' => [
                 'required',
                 'date'
             ],
 
-
             'city' => [
                 'required',
                 'string'
             ],
-
 
             'address' => [
                 'required',
                 'string'
             ],
 
-
             'last_education' => [
                 'required'
             ],
-
 
             'school_name' => [
                 'required',
                 'string'
             ],
 
-
             'graduation_year' => [
                 'required'
             ],
 
-
             'status' => [
                 'nullable'
             ],
-
 
             'notes' => [
                 'nullable',
@@ -180,10 +160,8 @@ class RegistrationController extends Controller
         ]);
 
 
-
         $this->registrationService
             ->create($data);
-
 
 
         return back()
@@ -191,11 +169,7 @@ class RegistrationController extends Controller
                 'success',
                 'Pendaftaran berhasil ditambahkan'
             );
-
     }
-
-
-
 
 
     /**
@@ -204,15 +178,12 @@ class RegistrationController extends Controller
     public function update(
         Request $request,
         int $id
-    )
-    {
-
+    ) {
         $data = $request->validate([
 
             'status' => [
                 'required'
             ],
-
 
             'notes' => [
                 'nullable',
@@ -220,7 +191,6 @@ class RegistrationController extends Controller
             ],
 
         ]);
-
 
 
         $this->registrationService
@@ -230,17 +200,12 @@ class RegistrationController extends Controller
             );
 
 
-
         return back()
             ->with(
                 'success',
                 'Status pendaftaran berhasil diperbarui'
             );
-
     }
-
-
-
 
 
     /**
@@ -248,18 +213,15 @@ class RegistrationController extends Controller
      */
     public function destroy(int $id)
     {
-
         $this->registrationService
             ->delete($id);
 
 
-
-        return back()
+        return redirect()
+            ->route('registrations.index')
             ->with(
                 'success',
-                'Data pendaftaran berhasil dihapus'
+                'Data pendaftar berhasil dihapus'
             );
-
     }
-
 }

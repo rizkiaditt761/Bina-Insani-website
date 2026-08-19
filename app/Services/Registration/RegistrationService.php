@@ -4,7 +4,10 @@ namespace App\Services\Registration;
 
 interface RegistrationService
 {
-    public function getAll();
+    public function getAll(
+        ?string $search = null,
+        ?string $status = null
+    );
 
     public function findById(int $id);
 
@@ -27,5 +30,4 @@ interface RegistrationService
         string $email,
         string $phone
     );
-
 }

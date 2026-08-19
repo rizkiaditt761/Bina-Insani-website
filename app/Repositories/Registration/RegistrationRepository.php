@@ -4,7 +4,10 @@ namespace App\Repositories\Registration;
 
 interface RegistrationRepository
 {
-    public function getAll();
+    public function getAll(
+        ?string $search = null,
+        ?string $status = null
+    );
 
     public function findById(int $id);
 

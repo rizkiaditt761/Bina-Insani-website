@@ -2,13 +2,14 @@
 
 namespace App\Services\RegistrationPayment;
 
+use App\Models\User;
+use App\Notifications\AdminPaymentNotification;
 use App\Repositories\RegistrationPayment\RegistrationPaymentRepository;
 use App\Services\Registration\RegistrationService;
 use Illuminate\Http\UploadedFile;
-use App\Models\User;
-use App\Notifications\AdminPaymentNotification;
 
-class RegistrationPaymentServiceImplement implements RegistrationPaymentService
+class RegistrationPaymentServiceImplement
+    implements RegistrationPaymentService
 {
     protected RegistrationPaymentRepository $registrationPaymentRepository;
 
@@ -19,13 +20,16 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
         RegistrationPaymentRepository $registrationPaymentRepository,
         RegistrationService $registrationService
     ) {
-        $this->registrationPaymentRepository = $registrationPaymentRepository;
-        $this->registrationService = $registrationService;
+        $this->registrationPaymentRepository =
+            $registrationPaymentRepository;
+
+        $this->registrationService =
+            $registrationService;
     }
 
 
     /**
-     * Get all payments
+     * Get all payments.
      */
     public function getAll(array $filters = [])
     {
@@ -35,7 +39,7 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
 
 
     /**
-     * Find payment by id
+     * Find payment by ID.
      */
     public function findById(int $id)
     {
@@ -45,7 +49,18 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
 
 
     /**
-     * Create payment
+     * Find payment by registration ID.
+     */
+    public function findByRegistrationId(
+        int $registrationId
+    ) {
+        return $this->registrationPaymentRepository
+            ->findByRegistrationId($registrationId);
+    }
+
+
+    /**
+     * Create payment.
      */
     public function create(array $data)
     {
@@ -55,17 +70,22 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
 
 
     /**
-     * Update payment
+     * Update payment.
      */
-    public function update(int $id, array $data)
-    {
+    public function update(
+        int $id,
+        array $data
+    ) {
         return $this->registrationPaymentRepository
-            ->update($id, $data);
+            ->update(
+                $id,
+                $data
+            );
     }
 
 
     /**
-     * Delete payment
+     * Delete payment.
      */
     public function delete(int $id)
     {
@@ -75,74 +95,94 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
 
 
     /**
-     * Find payment by registration
-     */
-    public function findByRegistrationId(int $registrationId)
-    {
-        return $this->registrationPaymentRepository
-            ->findByRegistrationId($registrationId);
-    }
-
-
-    /**
-     * Upload payment proof from participant
+     * Upload payment proof dari peserta.
      */
     public function uploadPayment(
         int $registrationId,
         UploadedFile $file
     ) {
-        $registration = $this->registrationService
-            ->findById($registrationId);
+        $registration =
+            $this->registrationService
+                ->findById($registrationId);
 
+
+        /*
+         * Simpan bukti pembayaran.
+         */
         $path = $file->store(
             'registration-payments',
             'public'
         );
 
-        $payment = $this->registrationPaymentRepository
-            ->createOrUpdate([
-                'registration_id' => $registrationId,
 
-                'payment_method' => 'QRIS',
+        /*
+         * Buat / update payment.
+         */
+        $payment =
+            $this->registrationPaymentRepository
+                ->createOrUpdate([
 
-                'amount' => $registration
-                    ->courseClass
-                    ->registration_fee,
+                    'registration_id' =>
+                        $registrationId,
 
-                'payment_proof' => $path,
+                    'payment_method' =>
+                        'QRIS',
 
-                'status' => 'waiting_verification',
+                    'amount' =>
+                        $registration
+                            ->courseClass
+                            ->registration_fee,
 
-                'rejection_reason' => null,
-            ]);
+                    'payment_proof' =>
+                        $path,
 
+                    'status' =>
+                        'waiting_verification',
+
+                    'rejection_reason' =>
+                        null,
+
+                ]);
+
+
+        /*
+         * Registration kembali ke tahap
+         * waiting verification.
+         */
         $this->registrationService
             ->update(
                 $registrationId,
                 [
-                    'status' => 'waiting_verification'
+                    'status' =>
+                        'waiting_verification',
                 ]
             );
 
-        // Kirim notifikasi pembayaran ke admin
-        User::all()->each(function ($user) use ($payment) {
-            $user->notify(
-                new AdminPaymentNotification($payment)
-            );
-        });
+
+        /*
+         * Kirim notifikasi ke admin.
+         */
+        User::query()
+            ->each(function ($user) use ($payment) {
+
+                $user->notify(
+                    new AdminPaymentNotification($payment)
+                );
+
+            });
+
 
         return $payment;
     }
 
 
     /**
-     * Approve payment
+     * Approve payment.
      */
     public function approve(
         int $id,
         int $verifiedBy
     ) {
-
         return $this->registrationPaymentRepository
             ->approve(
                 $id,
@@ -152,14 +192,13 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
 
 
     /**
-     * Reject payment
+     * Reject payment.
      */
     public function reject(
         int $id,
         int $verifiedBy,
         ?string $rejectionReason = null
     ) {
-
         return $this->registrationPaymentRepository
             ->reject(
                 $id,
@@ -170,31 +209,31 @@ class RegistrationPaymentServiceImplement implements RegistrationPaymentService
 
 
     /**
-     * Waiting verification
+     * Count waiting verification.
      */
-    public function getPending()
+    public function getPendingCount(): int
     {
         return $this->registrationPaymentRepository
-            ->getPending();
+            ->getPendingCount();
     }
 
 
     /**
-     * Verified payments
+     * Count verified.
      */
-    public function getVerified()
+    public function getVerifiedCount(): int
     {
         return $this->registrationPaymentRepository
-            ->getVerified();
+            ->getVerifiedCount();
     }
 
 
     /**
-     * Rejected payments
+     * Count rejected.
      */
-    public function getRejected()
+    public function getRejectedCount(): int
     {
         return $this->registrationPaymentRepository
-            ->getRejected();
+            ->getRejectedCount();
     }
 }

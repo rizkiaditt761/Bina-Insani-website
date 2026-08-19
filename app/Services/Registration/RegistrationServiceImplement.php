@@ -19,9 +19,14 @@ class RegistrationServiceImplement implements RegistrationService
     }
 
 
-    public function getAll()
-    {
-        return $this->registrationRepository->getAll();
+    public function getAll(
+        ?string $search = null,
+        ?string $status = null
+    ) {
+        return $this->registrationRepository->getAll(
+            $search,
+            $status
+        );
     }
 
 
@@ -29,6 +34,7 @@ class RegistrationServiceImplement implements RegistrationService
     {
         return $this->registrationRepository->findById($id);
     }
+
 
     public function findByRegistrationNumber(
         string $registrationNumber
@@ -53,18 +59,25 @@ class RegistrationServiceImplement implements RegistrationService
 
         // Kirim notifikasi ke admin
         User::all()->each(function ($user) use ($registration) {
+
             $user->notify(
                 new AdminRegistrationNotification($registration)
             );
+
         });
 
         return $registration;
     }
 
 
-    public function update(int $id, array $data)
-    {
-        return $this->registrationRepository->update($id, $data);
+    public function update(
+        int $id,
+        array $data
+    ) {
+        return $this->registrationRepository->update(
+            $id,
+            $data
+        );
     }
 
 
@@ -73,11 +86,13 @@ class RegistrationServiceImplement implements RegistrationService
         return $this->registrationRepository->delete($id);
     }
 
+
     public function generateRegistrationNumber()
     {
         do {
 
-            $registrationNumber = 'REG-' .
+            $registrationNumber =
+                'REG-' .
                 now()->format('Ymd') .
                 '-' .
                 strtoupper(Str::random(5));
@@ -90,6 +105,7 @@ class RegistrationServiceImplement implements RegistrationService
         return $registrationNumber;
     }
 
+
     public function updateStatus(
         int $registrationId,
         string $status
@@ -101,6 +117,7 @@ class RegistrationServiceImplement implements RegistrationService
             ]
         );
     }
+
 
     public function findByEmailAndPhone(
         string $email,

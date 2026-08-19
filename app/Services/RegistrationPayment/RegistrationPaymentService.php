@@ -19,7 +19,10 @@ interface RegistrationPaymentService
 
     public function create(array $data);
 
-    public function update(int $id, array $data);
+    public function update(
+        int $id,
+        array $data
+    );
 
     public function delete(int $id);
 
@@ -31,12 +34,12 @@ interface RegistrationPaymentService
     public function reject(
         int $id,
         int $verifiedBy,
-        ?string $notes = null
+        ?string $rejectionReason = null
     );
 
-    public function getPending();
+    public function getPendingCount(): int;
 
-    public function getVerified();
+    public function getVerifiedCount(): int;
 
-    public function getRejected();
+    public function getRejectedCount(): int;
 }
